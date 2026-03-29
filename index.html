@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hi ellie ✦</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #faf7f2;
+  --warm: #f0ebe1;
+  --sand: #e4dbd0;
+  --bark: #b8a899;
+  --ink: #221c15;
+  --soft-ink: #5c4f42;
+  --accent: #c9784a;
+  --accent-light: #e8b89a;
+  --green: #7a9e7e;
+  --sidebar-w: 220px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ════════ LANDING ════════ */
+#landing {
+  position: fixed;
+  inset: 0;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+#landing.out { opacity: 0; transform: translateY(-24px); pointer-events: none; }
+
+.landing-inner {
+  text-align: center;
+  padding: 2rem;
+  animation: fadeUp 1s ease both;
+}
+
+.landing-wordmark {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(3rem, 10vw, 6rem);
+  color: var(--cream);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+.landing-wordmark span { color: var(--accent); font-style: italic; }
+
+.landing-sub {
+  font-size: 0.82rem;
+  color: var(--bark);
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 3.5rem;
+}
+
+.landing-input {
+  display: block;
+  width: min(320px, 88vw);
+  margin: 0 auto 0.7rem;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 1rem 1.4rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  color: var(--cream);
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+.landing-input::placeholder { color: rgba(255,255,255,0.25); letter-spacing: 0.05em; }
+.landing-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
+
+.landing-error {
+  font-size: 0.75rem;
+  color: var(--accent-light);
+  font-style: italic;
+  min-height: 1.2em;
+  margin-bottom: 0.6rem;
+}
+
+.landing-btn {
+  display: block;
+  width: min(320px, 88vw);
+  margin: 0 auto;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.landing-btn:hover { background: #b8683a; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(201,120,74,0.4); }
+.landing-btn:active { transform: none; }
+
+.landing-hint { margin-top: 1.8rem; font-size: 0.68rem; color: rgba(255,255,255,0.18); letter-spacing: 0.05em; }
+
+/* ════════ APP ════════ */
+#app { display: none; min-height: 100vh; }
+#app.visible { display: flex; }
+
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: var(--sidebar-w);
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  padding: 2.2rem 0 1.5rem;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.1rem;
+  color: var(--cream);
+  padding: 0 1.6rem 2rem;
+  opacity: 0.9;
+}
+.sidebar-logo em { color: var(--accent); font-style: italic; }
+
+.sb-label {
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.22);
+  padding: 0 1.6rem 0.6rem;
+  font-weight: 500;
+}
+
+/* spine wrap */
+.spine-wrap {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  position: relative;
+}
+.spine-wrap::-webkit-scrollbar { display: none; }
+
+.spine-track {
+  position: absolute;
+  left: calc(1.6rem + 3px);
+  top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(255,255,255,0.07);
+}
+
+.spine-fill {
+  position: absolute;
+  left: calc(1.6rem + 3px);
+  top: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--accent) 0%, var(--accent-light) 100%);
+  height: 0%;
+  transition: height 0.3s ease;
+}
+
+.spine-list {
+  position: relative;
+  padding: 0.3rem 1rem 0.5rem 3.2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.spine-item {
+  position: relative;
+  padding: 0.55rem 0.5rem 0.55rem 0;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.spine-item:hover { background: rgba(255,255,255,0.04); }
+
+.spine-item::before {
+  content: '';
+  position: absolute;
+  left: -1.6rem;
+  top: 50%; transform: translateY(-50%);
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  transition: all 0.2s;
+}
+.spine-item:hover::before,
+.spine-item.active::before {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: translateY(-50%) scale(1.35);
+  box-shadow: 0 0 8px rgba(201,120,74,0.5);
+}
+
+.spine-date {
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.28);
+  margin-bottom: 0.1rem;
+}
+.spine-text {
+  font-size: 0.76rem;
+  color: rgba(255,255,255,0.48);
+  font-style: italic;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.15s;
+}
+.spine-item:hover .spine-text { color: rgba(255,255,255,0.8); }
+
+/* today pill */
+.sb-today {
+  margin: 0.8rem 1.2rem 0.8rem;
+  padding: 0.65rem 1rem;
+  background: rgba(201,120,74,0.1);
+  border: 1px solid rgba(201,120,74,0.22);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.sb-today:hover { background: rgba(201,120,74,0.18); }
+.sb-today-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-light); margin-bottom: 0.2rem; }
+.sb-today-text { font-size: 0.75rem; color: rgba(255,255,255,0.5); font-style: italic; }
+
+/* user row */
+.sb-user {
+  padding: 1rem 1.6rem 0;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+.sb-avatar {
+  width: 26px; height: 26px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.68rem; font-weight: 500; color: white;
+  flex-shrink: 0;
+}
+.sb-name { font-size: 0.78rem; color: rgba(255,255,255,0.45); }
+.btn-logout {
+  margin-left: auto;
+  background: none; border: none;
+  color: rgba(255,255,255,0.2);
+  font-size: 0.68rem; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: color 0.15s;
+}
+.btn-logout:hover { color: rgba(255,255,255,0.55); }
+
+/* ── Main ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  max-width: 700px;
+  padding: 0 2.8rem 6rem;
+}
+
+.app-header {
+  padding: 3.5rem 0 2.5rem;
+  animation: fadeDown 0.7s ease both;
+}
+.greeting {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+.greeting em { font-style: italic; color: var(--accent); }
+.subline { margin-top: 0.5rem; font-size: 0.88rem; color: var(--bark); font-weight: 300; }
+
+/* section label */
+.sec-label {
+  font-size: 0.63rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--bark);
+  font-weight: 500;
+  margin-bottom: 0.9rem;
+}
+
+/* today card */
+.today-card {
+  background: white;
+  border-radius: 18px;
+  padding: 1.6rem 1.8rem;
+  border: 1px solid var(--sand);
+  box-shadow: 0 2px 22px rgba(34,28,21,0.05);
+  margin-bottom: 3rem;
+  animation: fadeUp 0.8s 0.1s ease both;
+}
+.today-card.has-entry { border-color: var(--accent-light); background: #fffaf6; }
+
+.entry-form textarea {
+  width: 100%; border: none; outline: none; resize: none;
+  font-family: 'DM Sans', sans-serif; font-size: 1rem;
+  color: var(--ink); background: transparent;
+  line-height: 1.65; min-height: 75px;
+}
+.entry-form textarea::placeholder { color: var(--bark); }
+
+.form-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 1rem; padding-top: 1rem;
+  border-top: 1px solid var(--sand);
+}
+
+.summarizing {
+  display: none; font-size: 0.8rem;
+  color: var(--accent); font-style: italic;
+}
+.summarizing.on { display: block; animation: breathe 1.5s ease-in-out infinite; }
+
+@keyframes breathe { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.btn-archive {
+  background: var(--ink); color: var(--cream);
+  border: none; border-radius: 100px;
+  padding: 0.55rem 1.5rem;
+  font-family: 'DM Sans', sans-serif; font-size: 0.83rem;
+  letter-spacing: 0.04em; cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.btn-archive:hover { background: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 18px rgba(201,120,74,0.3); }
+.btn-archive:active { transform: none; }
+.btn-archive:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; background: var(--ink); }
+
+/* display state */
+.entry-display { display: none; }
+.today-card.has-entry .entry-display { display: block; }
+.today-card.has-entry .entry-form { display: none; }
+
+.archived-tag {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--green); margin-bottom: 0.8rem;
+}
+.green-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.disp-summary {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.3rem; line-height: 1.45;
+  color: var(--ink); margin-bottom: 0.5rem;
+}
+.disp-raw { font-size: 0.8rem; color: var(--bark); font-style: italic; line-height: 1.5; margin-bottom: 0.9rem; }
+.btn-edit {
+  background: none; border: 1px solid var(--sand);
+  color: var(--soft-ink); padding: 0.28rem 1rem;
+  border-radius: 100px; font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem; cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-edit:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Past feed ── */
+.past-section { animation: fadeUp 0.9s 0.2s ease both; }
+
+.feed { display: flex; flex-direction: column; }
+
+.empty { text-align: center; padding: 4rem 0 2rem; color: var(--bark); font-size: 0.86rem; font-style: italic; }
+
+.feed-item {
+  display: flex; gap: 1.6rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--sand);
+  cursor: pointer;
+  position: relative;
+}
+.feed-item:last-child { border-bottom: none; }
+.feed-item:hover { background: rgba(201,120,74,0.025); margin: 0 -0.5rem; padding: 1.5rem 0.5rem; border-radius: 8px; }
+
+.fi-date { flex-shrink: 0; width: 3.6rem; text-align: right; padding-top: 0.1rem; }
+.fi-month { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--bark); }
+.fi-day { font-family: 'Instrument Serif', serif; font-size: 1.55rem; color: var(--soft-ink); line-height: 1; }
+
+.fi-connector { display: flex; flex-direction: column; align-items: center; padding-top: 0.3rem; }
+.fi-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--sand); border: 2px solid var(--bark);
+  flex-shrink: 0; z-index: 1;
+  transition: all 0.2s;
+}
+.feed-item:hover .fi-dot { background: var(--accent-light); border-color: var(--accent); transform: scale(1.3); }
+.fi-line { flex: 1; width: 1px; background: var(--sand); margin-top: 5px; }
+.feed-item:last-child .fi-line { display: none; }
+
+.fi-body { flex: 1; }
+.fi-summary {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.05rem; color: var(--ink); line-height: 1.4;
+  transition: color 0.2s;
+}
+.feed-item:hover .fi-summary { color: var(--accent); }
+.fi-raw {
+  margin-top: 0.3rem; font-size: 0.77rem;
+  color: var(--bark); font-style: italic; line-height: 1.45;
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.3s ease;
+}
+.feed-item.open .fi-raw { max-height: 120px; opacity: 1; }
+
+/* ═══ Modal ═══ */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(34,28,21,0.5);
+  backdrop-filter: blur(6px);
+  z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--cream);
+  border-radius: 22px;
+  padding: 2.2rem;
+  max-width: 450px; width: 100%;
+  box-shadow: 0 30px 80px rgba(34,28,21,0.22);
+  transform: translateY(16px) scale(0.97);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.overlay.open .modal { transform: none; }
+
+.modal-date { font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--bark); margin-bottom: 0.6rem; }
+.modal-summary { font-family: 'Instrument Serif', serif; font-size: 1.5rem; line-height: 1.3; color: var(--ink); margin-bottom: 1.1rem; }
+.modal-raw { font-size: 0.87rem; color: var(--soft-ink); line-height: 1.65; padding: 1rem 1.2rem; background: var(--warm); border-radius: 12px; font-style: italic; }
+.modal-foot { margin-top: 1.5rem; display: flex; justify-content: flex-end; }
+.btn-mclose {
+  background: var(--ink); color: var(--cream); border: none;
+  padding: 0.5rem 1.4rem; border-radius: 100px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.8rem;
+  cursor: pointer; transition: background 0.15s;
+}
+.btn-mclose:hover { background: var(--accent); }
+
+/* ── Animations ── */
+@keyframes fadeDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp   { from{opacity:0;transform:translateY(12px)}  to{opacity:1;transform:translateY(0)} }
+@keyframes popIn    { from{transform:scale(0)} to{transform:scale(1)} }
+
+@media (max-width: 640px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 0 1.4rem 4rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="landing">
+  <div class="landing-inner">
+    <h1 class="landing-wordmark">days<span>.</span></h1>
+    <p class="landing-sub">one line · every day · forever</p>
+    <input class="landing-input" id="pcInput" type="password" placeholder="passcode" autocomplete="off" spellcheck="false" />
+    <p class="landing-error" id="pcError">&nbsp;</p>
+    <button class="landing-btn" id="pcBtn">enter →</button>
+    <p class="landing-hint">your private journal</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><em>days</em></div>
+    <div class="sb-label">timeline</div>
+
+    <div class="spine-wrap" id="spineWrap">
+      <div class="spine-track"></div>
+      <div class="spine-fill" id="spineFill"></div>
+      <div class="spine-list" id="spineList"></div>
+    </div>
+
+    <div class="sb-today" id="sbToday" onclick="scrollToTop()">
+      <div class="sb-today-label">↑ today</div>
+      <div class="sb-today-text" id="sbTodayText">write something…</div>
+    </div>
+
+    <div class="sb-user">
+      <div class="sb-avatar">e</div>
+      <span class="sb-name">ellie</span>
+      <button class="btn-logout" onclick="logout()">sign out</button>
+    </div>
+  </aside>
+
+  <main class="main" id="mainArea">
+    <header class="app-header">
+      <h1 class="greeting">hi, <em>ellie</em> ✦</h1>
+      <p class="subline">one thing a day — your life, in your own words</p>
+    </header>
+
+    <div class="sec-label">today — <span id="todayLabel"></span></div>
+    <div class="today-card" id="todayCard">
+      <div class="entry-form">
+        <textarea id="entryInput" maxlength="500" placeholder="what happened today? anything counts…" rows="3"></textarea>
+        <div class="form-footer">
+          <span class="summarizing" id="summarizing">✦ distilling your day…</span>
+          <button class="btn-archive" id="archiveBtn" disabled>archive it</button>
+        </div>
+      </div>
+      <div class="entry-display">
+        <div class="archived-tag"><span class="green-dot"></span>archived today</div>
+        <p class="disp-summary" id="dispSummary"></p>
+        <p class="disp-raw" id="dispRaw"></p>
+        <button class="btn-edit" id="editBtn">edit</button>
+      </div>
+    </div>
+
+    <div class="past-section">
+      <div class="sec-label">your story so far</div>
+      <div class="feed" id="feed">
+        <p class="empty" id="emptyMsg">your days will appear here ✦</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="modal-date" id="mDate"></div>
+    <p class="modal-summary" id="mSummary"></p>
+    <p class="modal-raw" id="mRaw"></p>
+    <div class="modal-foot"><button class="btn-mclose" onclick="closeModal()">close</button></div>
+  </div>
+</div>
+
+<script>
+// ── Config ──
+const PASSCODE   = 'ellie';
+const DATA_KEY   = 'ellie_days_v2';
+const SESS_KEY   = 'ellie_sess';
+
+// ── Storage ──
+const load = () => { try { return JSON.parse(localStorage.getItem(DATA_KEY)) || {}; } catch { return {}; } };
+const save = d => localStorage.setItem(DATA_KEY, JSON.stringify(d));
+
+// ── Auth ──
+const isIn   = () => sessionStorage.getItem(SESS_KEY) === '1';
+const signIn = () => sessionStorage.setItem(SESS_KEY, '1');
+const signOut= () => sessionStorage.removeItem(SESS_KEY);
+
+function logout() {
+  signOut();
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('landing').classList.remove('out');
+  document.getElementById('pcInput').value = '';
+}
+
+// ── Date ──
+const pad = n => String(n).padStart(2,'0');
+const todayKey = () => { const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+const parseKey = k => { const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d); };
+const fmtFull  = k => parseKey(k).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+const fmtShort = k => { const d=parseKey(k); return { month:d.toLocaleDateString('en-US',{month:'short'}), day:d.getDate(), full:fmtFull(k) }; };
+const fmtMini  = k => parseKey(k).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+
+// ── Landing ──
+const pcInput = document.getElementById('pcInput');
+const pcError = document.getElementById('pcError');
+
+document.getElementById('pcBtn').addEventListener('click', tryLogin);
+pcInput.addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+
+function tryLogin() {
+  if (pcInput.value.trim().toLowerCase() === PASSCODE) {
+    signIn();
+    document.getElementById('landing').classList.add('out');
+    setTimeout(() => {
+      document.getElementById('app').style.display = 'flex';
+      document.getElementById('app').classList.add('visible');
+      initApp();
+    }, 680);
+  } else {
+    pcError.textContent = 'hmm, try again ✦';
+    pcInput.value = '';
+    pcInput.style.borderColor = 'var(--accent)';
+    setTimeout(() => { pcInput.style.borderColor=''; pcError.textContent='\u00a0'; }, 1400);
+  }
+}
+
+// ── App init ──
+const TODAY = todayKey();
+
+function initApp() {
+  document.getElementById('todayLabel').textContent = fmtFull(TODAY);
+  const data = load();
+  if (data[TODAY]) showTodayEntry(data[TODAY].raw, data[TODAY].summary);
+  renderFeed();
+  renderSpine();
+  initScrollFill();
+}
+
+// ── Entry ──
+const entryInput  = document.getElementById('entryInput');
+const archiveBtn  = document.getElementById('archiveBtn');
+const summarizing = document.getElementById('summarizing');
+const todayCard   = document.getElementById('todayCard');
+
+entryInput.addEventListener('input', () => {
+  archiveBtn.disabled = entryInput.value.trim().length < 3;
+});
+
+archiveBtn.addEventListener('click', async () => {
+  const raw = entryInput.value.trim();
+  if (!raw) return;
+  archiveBtn.disabled = true;
+  summarizing.classList.add('on');
+  const summary = await summarize(raw);
+  summarizing.classList.remove('on');
+  const data = load();
+  data[TODAY] = { raw, summary, ts: Date.now() };
+  save(data);
+  showTodayEntry(raw, summary);
+  renderFeed();
+  renderSpine();
+});
+
+document.getElementById('editBtn').addEventListener('click', () => {
+  const d = load();
+  if (d[TODAY]) {
+    entryInput.value = d[TODAY].raw;
+    archiveBtn.disabled = false;
+    todayCard.classList.remove('has-entry');
+    entryInput.focus();
+  }
+});
+
+function showTodayEntry(raw, summary) {
+  document.getElementById('dispSummary').textContent = summary;
+  document.getElementById('dispRaw').textContent = '\u201c' + raw + '\u201d';
+  todayCard.classList.add('has-entry');
+  document.getElementById('sbTodayText').textContent = summary;
+}
+
+// ── Summarize ──
+async function summarize(text) {
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: `You are helping someone named Ellie capture her life in beautiful, meaningful one-liners. She wrote about her day:\n\n"${text}"\n\nWrite a single poetic, warm, first-person sentence (10–20 words) that captures the essence of what she did. Make it feel personal, reflective, and memorable. No quotes, no preamble, just the sentence.` }]
+      })
+    });
+    const d = await res.json();
+    return d.content?.[0]?.text?.trim() || text;
+  } catch {
+    return text.length > 90 ? text.slice(0,87)+'…' : text;
+  }
+}
+
+// ── Feed ──
+function renderFeed() {
+  const data = load();
+  const keys = Object.keys(data).sort((a,b)=>b.localeCompare(a)).filter(k=>k!==TODAY);
+  const feed = document.getElementById('feed');
+  feed.innerHTML = '';
+
+  if (!keys.length) {
+    feed.innerHTML = '<p class="empty">your days will appear here ✦</p>';
+    return;
+  }
+
+  keys.forEach((key, i) => {
+    const e = data[key];
+    const { month, day, full } = fmtShort(key);
+    const item = document.createElement('div');
+    item.className = 'feed-item';
+    item.dataset.key = key;
+    item.style.animationDelay = `${i*0.05}s`;
+    item.innerHTML = `
+      <div class="fi-date"><div class="fi-month">${month}</div><div class="fi-day">${day}</div></div>
+      <div class="fi-connector"><div class="fi-dot"></div><div class="fi-line"></div></div>
+      <div class="fi-body">
+        <p class="fi-summary">${e.summary}</p>
+        <p class="fi-raw">\u201c${e.raw}\u201d</p>
+      </div>`;
+    item.addEventListener('click', () => openModal(full, e.summary, e.raw));
+    feed.appendChild(item);
+  });
+}
+
+// ── Sidebar spine ──
+function renderSpine() {
+  const data = load();
+  const keys = Object.keys(data).sort((a,b)=>b.localeCompare(a)).filter(k=>k!==TODAY);
+  const list = document.getElementById('spineList');
+  list.innerHTML = '';
+
+  keys.forEach(key => {
+    const e = data[key];
+    const item = document.createElement('div');
+    item.className = 'spine-item';
+    item.dataset.key = key;
+    item.innerHTML = `<div class="spine-date">${fmtMini(key)}</div><div class="spine-text">${e.summary}</div>`;
+    item.addEventListener('click', () => {
+      const el = document.querySelector(`.feed-item[data-key="${key}"]`);
+      if (el) { el.scrollIntoView({ behavior:'smooth', block:'center' }); el.classList.add('open'); setTimeout(()=>el.classList.remove('open'), 2200); }
+    });
+    list.appendChild(item);
+  });
+}
+
+// ── Scroll-driven spine fill ──
+function initScrollFill() {
+  const fill = document.getElementById('spineFill');
+  window.addEventListener('scroll', () => {
+    const pct = document.body.scrollHeight > window.innerHeight
+      ? Math.min(100, window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100)
+      : 0;
+    fill.style.height = pct + '%';
+
+    // highlight active
+    document.querySelectorAll('.spine-item').forEach(si => {
+      const el = document.querySelector(`.feed-item[data-key="${si.dataset.key}"]`);
+      if (el) {
+        const r = el.getBoundingClientRect();
+        si.classList.toggle('active', r.top < window.innerHeight * 0.55 && r.bottom > 0);
+      }
+    });
+  }, { passive: true });
+}
+
+function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+// ── Modal ──
+function openModal(date, summary, raw) {
+  document.getElementById('mDate').textContent = date;
+  document.getElementById('mSummary').textContent = summary;
+  document.getElementById('mRaw').textContent = '\u201c' + raw + '\u201d';
+  document.getElementById('overlay').classList.add('open');
+}
+function bgClose(e) { if (e.target===document.getElementById('overlay')) closeModal(); }
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+// ── Boot ──
+if (isIn()) {
+  document.getElementById('landing').classList.add('out');
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('app').classList.add('visible');
+  initApp();
+}
+</script>
+</body>
+</html>
