@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>hi ellie ✦</title>
+<title>timeline ✦</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -75,6 +75,37 @@ body::after {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 3.5rem;
+}
+
+/* mode toggle */
+.landing-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 1.6rem;
+  background: rgba(255,255,255,0.06);
+  border-radius: 100px;
+  padding: 3px;
+  width: min(320px, 88vw);
+  margin-left: auto;
+  margin-right: auto;
+}
+.toggle-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.35);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  padding: 0.45rem 0;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.toggle-btn.active {
+  background: rgba(255,255,255,0.1);
+  color: var(--cream);
 }
 
 .landing-input {
@@ -159,7 +190,6 @@ body::after {
   font-weight: 500;
 }
 
-/* spine wrap */
 .spine-wrap {
   flex: 1;
   overflow-y: auto;
@@ -242,7 +272,6 @@ body::after {
 }
 .spine-item:hover .spine-text { color: rgba(255,255,255,0.8); }
 
-/* today pill */
 .sb-today {
   margin: 0.8rem 1.2rem 0.8rem;
   padding: 0.65rem 1rem;
@@ -257,7 +286,6 @@ body::after {
 .sb-today-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-light); margin-bottom: 0.2rem; }
 .sb-today-text { font-size: 0.75rem; color: rgba(255,255,255,0.5); font-style: italic; }
 
-/* user row */
 .sb-user {
   padding: 1rem 1.6rem 0;
   border-top: 1px solid rgba(255,255,255,0.07);
@@ -298,6 +326,7 @@ body::after {
   padding: 3.5rem 0 2.5rem;
   animation: fadeDown 0.7s ease both;
 }
+.app-header-left { flex: 1; }
 .greeting {
   font-family: 'Instrument Serif', serif;
   font-size: clamp(2.4rem, 5vw, 3.8rem);
@@ -306,6 +335,37 @@ body::after {
 }
 .greeting em { font-style: italic; color: var(--accent); }
 .subline { margin-top: 0.5rem; font-size: 0.88rem; color: var(--bark); font-weight: 300; }
+
+/* ── Streak badge ── */
+.streak-badge {
+  position: fixed;
+  top: 1.1rem;
+  right: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.05rem;
+  animation: fadeDown 0.7s 0.15s ease both;
+  z-index: 90;
+  text-align: right;
+}
+.streak-num {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--soft-ink);
+  transition: color 0.3s;
+}
+.streak-badge.hot .streak-num { color: var(--accent); }
+.streak-label {
+  font-size: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--bark);
+  font-weight: 500;
+  transition: color 0.3s;
+}
+.streak-badge.hot .streak-label { color: var(--accent-light); }
 
 /* section label */
 .sec-label {
@@ -363,7 +423,6 @@ body::after {
 .btn-archive:active { transform: none; }
 .btn-archive:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; background: var(--ink); }
 
-/* display state */
 .entry-display { display: none; }
 .today-card.has-entry .entry-display { display: block; }
 .today-card.has-entry .entry-form { display: none; }
@@ -395,9 +454,7 @@ body::after {
 
 /* ── Past feed ── */
 .past-section { animation: fadeUp 0.9s 0.2s ease both; }
-
 .feed { display: flex; flex-direction: column; }
-
 .empty { text-align: center; padding: 4rem 0 2rem; color: var(--bark); font-size: 0.86rem; font-style: italic; }
 
 .feed-item {
@@ -485,6 +542,7 @@ body::after {
   :root { --sidebar-w: 0px; }
   .sidebar { display: none; }
   .main { margin-left: 0; padding: 0 1.4rem 4rem; }
+  .streak-badge { margin-top: 3.5rem; }
 }
 </style>
 </head>
@@ -495,18 +553,30 @@ body::after {
   <div class="landing-inner">
     <h1 class="landing-wordmark">timeline<span>.</span></h1>
     <p class="landing-sub">one line · every day · forever</p>
-    <input class="landing-input" id="pcInput" type="password" placeholder="passcode" autocomplete="off" spellcheck="false" />
+
+    <div class="landing-toggle">
+      <button class="toggle-btn active" id="toggleSignIn" onclick="setMode('signin')">sign in</button>
+      <button class="toggle-btn" id="toggleCreate" onclick="setMode('create')">new here?</button>
+    </div>
+
+    <input class="landing-input" id="nameInput" type="text" placeholder="your name" autocomplete="off" spellcheck="false" />
+    <input class="landing-input" id="pwInput" type="password" placeholder="password" autocomplete="off" />
     <p class="landing-error" id="pcError">&nbsp;</p>
     <button class="landing-btn" id="pcBtn">enter →</button>
-    <p class="landing-hint">your private journal</p>
+    <p class="landing-hint" id="landingHint">sign in with your name &amp; password</p>
   </div>
 </div>
 
 <!-- APP -->
 <div id="app">
+  <!-- streak badge lives here so fixed positioning isn't trapped by parent transforms -->
+  <div class="streak-badge" id="streakBadge">
+    <div class="streak-num" id="streakNum">0</div>
+    <div class="streak-label">day streak</div>
+  </div>
   <aside class="sidebar">
     <div class="sidebar-logo"><em>timeline.</em></div>
-    <div class="sb-label">your awesome life</div>
+    <div class="sb-label" id="sbLabel">your awesome life</div>
 
     <div class="spine-wrap" id="spineWrap">
       <div class="spine-track"></div>
@@ -520,16 +590,18 @@ body::after {
     </div>
 
     <div class="sb-user">
-      <div class="sb-avatar">e</div>
-      <span class="sb-name">ellie</span>
+      <div class="sb-avatar" id="sbAvatar">?</div>
+      <span class="sb-name" id="sbName">—</span>
       <button class="btn-logout" onclick="logout()">sign out</button>
     </div>
   </aside>
 
   <main class="main" id="mainArea">
     <header class="app-header">
-      <h1 class="greeting">hi, <em>ellie</em> ✦</h1>
-      <p class="subline">one thing a day — your life, in your own words</p>
+      <div class="app-header-left">
+        <h1 class="greeting">hi, <em id="greetName">there</em> ✦</h1>
+        <p class="subline">one thing a day — your life, in your own words</p>
+      </div>
     </header>
 
     <div class="sec-label">today — <span id="todayLabel"></span></div>
@@ -569,69 +641,151 @@ body::after {
 </div>
 
 <script>
-// ── Config ──
-const PASSCODE   = 'ellie';
-const DATA_KEY   = 'ellie_days_v2';
-const SESS_KEY   = 'ellie_sess';
+// ── Storage keys ──
+const USERS_KEY  = 'timeline_users_v1';   // { username: { name, created } }
+const dataKey    = u => `timeline_data_${u}`;
+const SESS_KEY   = 'timeline_sess_v1';    // stores current username
 
-// ── Storage ──
-const load = () => { try { return JSON.parse(localStorage.getItem(DATA_KEY)) || {}; } catch { return {}; } };
-const save = d => localStorage.setItem(DATA_KEY, JSON.stringify(d));
+// ── Users store ──
+const loadUsers = () => { try { return JSON.parse(localStorage.getItem(USERS_KEY)) || {}; } catch { return {}; } };
+const saveUsers = u => localStorage.setItem(USERS_KEY, JSON.stringify(u));
 
-// ── Auth ──
-const isIn   = () => sessionStorage.getItem(SESS_KEY) === '1';
-const signIn = () => sessionStorage.setItem(SESS_KEY, '1');
-const signOut= () => sessionStorage.removeItem(SESS_KEY);
+// ── Per-user data ──
+const loadData = u => { try { return JSON.parse(localStorage.getItem(dataKey(u))) || {}; } catch { return {}; } };
+const saveData = (u, d) => localStorage.setItem(dataKey(u), JSON.stringify(d));
 
-function logout() {
-  signOut();
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('landing').classList.remove('out');
-  document.getElementById('pcInput').value = '';
+// ── Session ──
+const getSession = () => { try { return JSON.parse(sessionStorage.getItem(SESS_KEY)); } catch { return null; } };
+const setSession = u => sessionStorage.setItem(SESS_KEY, JSON.stringify(u));
+const clearSession = () => sessionStorage.removeItem(SESS_KEY);
+
+// ── Mode ──
+let mode = 'signin'; // 'signin' | 'create'
+function setMode(m) {
+  mode = m;
+  document.getElementById('toggleSignIn').classList.toggle('active', m === 'signin');
+  document.getElementById('toggleCreate').classList.toggle('active', m === 'create');
+  document.getElementById('pcBtn').textContent = m === 'signin' ? 'enter →' : 'create account →';
+  document.getElementById('landingHint').textContent = m === 'signin' ? 'sign in with your name & password' : 'pick a name and a password';
+  document.getElementById('pcError').textContent = '\u00a0';
+  document.getElementById('nameInput').focus();
 }
 
-// ── Date ──
-const pad = n => String(n).padStart(2,'0');
-const todayKey = () => { const d=new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
-const parseKey = k => { const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d); };
-const fmtFull  = k => parseKey(k).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-const fmtShort = k => { const d=parseKey(k); return { month:d.toLocaleDateString('en-US',{month:'short'}), day:d.getDate(), full:fmtFull(k) }; };
-const fmtMini  = k => parseKey(k).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-
 // ── Landing ──
-const pcInput = document.getElementById('pcInput');
-const pcError = document.getElementById('pcError');
+const nameInput = document.getElementById('nameInput');
+const pwInput   = document.getElementById('pwInput');
+const pcError   = document.getElementById('pcError');
 
-document.getElementById('pcBtn').addEventListener('click', tryLogin);
-pcInput.addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+document.getElementById('pcBtn').addEventListener('click', tryAuth);
+nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') { pwInput.focus(); } });
+pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryAuth(); });
 
-function tryLogin() {
-  if (pcInput.value.trim().toLowerCase() === PASSCODE) {
-    signIn();
-    document.getElementById('landing').classList.add('out');
-    setTimeout(() => {
-      document.getElementById('app').style.display = 'flex';
-      document.getElementById('app').classList.add('visible');
-      initApp();
-    }, 680);
+function tryAuth() {
+  const raw = nameInput.value.trim();
+  const pw  = pwInput.value;
+  if (!raw) { showError('enter your name ✦'); nameInput.focus(); return; }
+  if (!pw)  { showError('enter a password ✦'); pwInput.focus(); return; }
+  const username = raw.toLowerCase().replace(/\s+/g, '_');
+  const displayName = raw;
+
+  const users = loadUsers();
+
+  if (mode === 'signin') {
+    if (!users[username]) { showError('no account found — create one?'); return; }
+    if (!users[username].password) {
+      // legacy account — set password now
+      users[username].password = pw;
+      saveUsers(users);
+    } else if (users[username].password !== pw) {
+      showError('wrong password ✦'); pwInput.value = ''; pwInput.focus(); return;
+    }
+    doLogin(username);
   } else {
-    pcError.textContent = 'hmm, try again ✦';
-    pcInput.value = '';
-    pcInput.style.borderColor = 'var(--accent)';
-    setTimeout(() => { pcInput.style.borderColor=''; pcError.textContent='\u00a0'; }, 1400);
+    if (users[username]) { showError('name taken — try signing in?'); return; }
+    users[username] = { name: displayName, password: pw, created: Date.now() };
+    saveUsers(users);
+    doLogin(username);
   }
 }
 
+function showError(msg) {
+  pcError.textContent = msg;
+  setTimeout(() => { pcError.textContent = '\u00a0'; }, 1800);
+}
+
+function doLogin(username) {
+  setSession(username);
+  nameInput.value = '';
+  pwInput.value = '';
+  document.getElementById('landing').classList.add('out');
+  setTimeout(() => {
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('app').classList.add('visible');
+    initApp(username);
+  }, 680);
+}
+
+function logout() {
+  clearSession();
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('landing').classList.remove('out');
+  nameInput.value = '';
+  pwInput.value = '';
+}
+
+// ── Date helpers ──
+const pad = n => String(n).padStart(2,'0');
+const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+const parseKey = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d); };
+const fmtFull  = k => parseKey(k).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+const fmtShort = k => { const d = parseKey(k); return { month: d.toLocaleDateString('en-US',{month:'short'}), day: d.getDate(), full: fmtFull(k) }; };
+const fmtMini  = k => parseKey(k).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+
+// ── Streak ──
+function calcStreak(data) {
+  const check = new Date();
+  const tk = todayKey();
+  // if no entry today, start streak from yesterday
+  if (!data[tk]) check.setDate(check.getDate() - 1);
+  let streak = 0;
+  while (true) {
+    const k = `${check.getFullYear()}-${pad(check.getMonth()+1)}-${pad(check.getDate())}`;
+    if (data[k]) { streak++; check.setDate(check.getDate() - 1); }
+    else break;
+  }
+  return streak;
+}
+
+function renderStreak(data) {
+  const n = calcStreak(data);
+  const badge  = document.getElementById('streakBadge');
+  const numEl  = document.getElementById('streakNum');
+  numEl.textContent = n;
+  badge.classList.toggle('hot', n >= 3);
+}
+
 // ── App init ──
+let CURRENT_USER = null;
 const TODAY = todayKey();
 
-function initApp() {
+function initApp(username) {
+  CURRENT_USER = username;
+  const users = loadUsers();
+  const displayName = users[username]?.name || username;
+
+  // Update UI chrome
+  document.getElementById('greetName').textContent = displayName;
+  document.getElementById('sbAvatar').textContent  = displayName[0].toLowerCase();
+  document.getElementById('sbName').textContent    = displayName;
+  document.getElementById('sbLabel').textContent   = `${displayName}'s awesome life`;
   document.getElementById('todayLabel').textContent = fmtFull(TODAY);
-  const data = load();
+
+  const data = loadData(CURRENT_USER);
   if (data[TODAY]) showTodayEntry(data[TODAY].raw, data[TODAY].summary);
   renderFeed();
   renderSpine();
+  renderStreak(data);
   initScrollFill();
 }
 
@@ -650,18 +804,19 @@ archiveBtn.addEventListener('click', async () => {
   if (!raw) return;
   archiveBtn.disabled = true;
   summarizing.classList.add('on');
-  const summary = await summarize(raw);
+  const summary = await summarize(raw, CURRENT_USER);
   summarizing.classList.remove('on');
-  const data = load();
+  const data = loadData(CURRENT_USER);
   data[TODAY] = { raw, summary, ts: Date.now() };
-  save(data);
+  saveData(CURRENT_USER, data);
   showTodayEntry(raw, summary);
   renderFeed();
   renderSpine();
+  renderStreak(data);
 });
 
 document.getElementById('editBtn').addEventListener('click', () => {
-  const d = load();
+  const d = loadData(CURRENT_USER);
   if (d[TODAY]) {
     entryInput.value = d[TODAY].raw;
     archiveBtn.disabled = false;
@@ -678,7 +833,9 @@ function showTodayEntry(raw, summary) {
 }
 
 // ── Summarize ──
-async function summarize(text) {
+async function summarize(text, username) {
+  const users = loadUsers();
+  const name  = users[username]?.name || username;
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -686,7 +843,7 @@ async function summarize(text) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
-        messages: [{ role: 'user', content: `You are helping someone named Ellie capture her life in beautiful, meaningful one-liners. She wrote about her day:\n\n"${text}"\n\nWrite a single poetic, warm, first-person sentence (10–20 words) that captures the essence of what she did. Make it feel personal, reflective, and memorable. No quotes, no preamble, just the sentence.` }]
+        messages: [{ role: 'user', content: `You are helping someone named ${name} capture their life in beautiful, meaningful one-liners. They wrote about their day:\n\n"${text}"\n\nWrite a single poetic, warm, first-person sentence (10–20 words) that captures the essence of what they did. Make it feel personal, reflective, and memorable. No quotes, no preamble, just the sentence.` }]
       })
     });
     const d = await res.json();
@@ -698,7 +855,7 @@ async function summarize(text) {
 
 // ── Feed ──
 function renderFeed() {
-  const data = load();
+  const data = loadData(CURRENT_USER);
   const keys = Object.keys(data).sort((a,b)=>b.localeCompare(a)).filter(k=>k!==TODAY);
   const feed = document.getElementById('feed');
   feed.innerHTML = '';
@@ -729,7 +886,7 @@ function renderFeed() {
 
 // ── Sidebar spine ──
 function renderSpine() {
-  const data = load();
+  const data = loadData(CURRENT_USER);
   const keys = Object.keys(data).sort((a,b)=>b.localeCompare(a)).filter(k=>k!==TODAY);
   const list = document.getElementById('spineList');
   list.innerHTML = '';
@@ -756,8 +913,6 @@ function initScrollFill() {
       ? Math.min(100, window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100)
       : 0;
     fill.style.height = pct + '%';
-
-    // highlight active
     document.querySelectorAll('.spine-item').forEach(si => {
       const el = document.querySelector(`.feed-item[data-key="${si.dataset.key}"]`);
       if (el) {
@@ -777,16 +932,22 @@ function openModal(date, summary, raw) {
   document.getElementById('mRaw').textContent = '\u201c' + raw + '\u201d';
   document.getElementById('overlay').classList.add('open');
 }
-function bgClose(e) { if (e.target===document.getElementById('overlay')) closeModal(); }
+function bgClose(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 function closeModal() { document.getElementById('overlay').classList.remove('open'); }
-document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 // ── Boot ──
-if (isIn()) {
-  document.getElementById('landing').classList.add('out');
-  document.getElementById('app').style.display = 'flex';
-  document.getElementById('app').classList.add('visible');
-  initApp();
+const sess = getSession();
+if (sess) {
+  const users = loadUsers();
+  if (users[sess]) {
+    document.getElementById('landing').classList.add('out');
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('app').classList.add('visible');
+    initApp(sess);
+  } else {
+    clearSession();
+  }
 }
 </script>
 </body>
