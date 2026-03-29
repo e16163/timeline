@@ -351,7 +351,7 @@ body::after {
 }
 .streak-num {
   font-family: 'Instrument Serif', serif;
-  font-size: 1.6rem;
+  font-size: 2rem;
   line-height: 1;
   color: var(--soft-ink);
   transition: color 0.3s;
@@ -655,9 +655,9 @@ const loadData = u => { try { return JSON.parse(localStorage.getItem(dataKey(u))
 const saveData = (u, d) => localStorage.setItem(dataKey(u), JSON.stringify(d));
 
 // ── Session ──
-const getSession = () => { try { return JSON.parse(sessionStorage.getItem(SESS_KEY)); } catch { return null; } };
-const setSession = u => sessionStorage.setItem(SESS_KEY, JSON.stringify(u));
-const clearSession = () => sessionStorage.removeItem(SESS_KEY);
+const getSession = () => { try { return JSON.parse(localStorage.getItem(SESS_KEY)); } catch { return null; } };
+const setSession = u => localStorage.setItem(SESS_KEY, JSON.stringify(u));
+const clearSession = () => localStorage.removeItem(SESS_KEY);
 
 // ── Mode ──
 let mode = 'signin'; // 'signin' | 'create'
