@@ -641,26 +641,85 @@ body::after {
 </div>
 
 <script>
-// ── Storage keys ──
-const USERS_KEY  = 'timeline_users_v1';   // { username: { name, created } }
-const dataKey    = u => `timeline_data_${u}`;
-const SESS_KEY   = 'timeline_sess_v1';    // stores current username
+// ════════════════════════════════════════════════════
+//  FIREBASE CONFIG — paste yours from Firebase console
+//  Leave as-is to use localStorage (works locally/for testing)
+// ════════════════════════════════════════════════════
+const FIREBASE_DB_URL = 'https://timeline-307ab-default-rtdb.firebaseio.com';
+// ════════════════════════════════════════════════════
 
-// ── Users store ──
-const loadUsers = () => { try { return JSON.parse(localStorage.getItem(USERS_KEY)) || {}; } catch { return {}; } };
-const saveUsers = u => localStorage.setItem(USERS_KEY, JSON.stringify(u));
+const USE_FIREBASE = !FIREBASE_DB_URL.includes('YOUR_PROJECT_ID');
 
-// ── Per-user data ──
-const loadData = u => { try { return JSON.parse(localStorage.getItem(dataKey(u))) || {}; } catch { return {}; } };
-const saveData = (u, d) => localStorage.setItem(dataKey(u), JSON.stringify(d));
+// Firebase Realtime Database via REST (no SDK needed)
+const db = {
+  async get(path) {
+    const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`);
+    if (!res.ok) return null;
+    return res.json();
+  },
+  async set(path, val) {
+    await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(val)
+    });
+  }
+};
 
-// ── Session ──
-const getSession = () => { try { return JSON.parse(localStorage.getItem(SESS_KEY)); } catch { return null; } };
-const setSession = u => localStorage.setItem(SESS_KEY, JSON.stringify(u));
-const clearSession = () => localStorage.removeItem(SESS_KEY);
+async function loadUsers() {
+  try {
+    if (USE_FIREBASE) {
+      const data = await db.get('users');
+      if (data) {
+        localStorage.setItem('tl_users_cache', JSON.stringify(data));
+        return data;
+      }
+    }
+    return JSON.parse(localStorage.getItem('tl_users') || localStorage.getItem('tl_users_cache') || '{}');
+  } catch {
+    return JSON.parse(localStorage.getItem('tl_users') || localStorage.getItem('tl_users_cache') || '{}');
+  }
+}
+async function saveUsers(u) {
+  try {
+    if (USE_FIREBASE) await db.set('users', u);
+    else localStorage.setItem('tl_users', JSON.stringify(u));
+    // always mirror to localStorage as fallback
+    localStorage.setItem('tl_users_cache', JSON.stringify(u));
+  } catch(e) {
+    // Firebase failed — save locally so user isn't locked out
+    localStorage.setItem('tl_users', JSON.stringify(u));
+    throw e; // re-throw so tryAuth knows
+  }
+}
+async function loadData(u) {
+  try {
+    if (USE_FIREBASE) return (await db.get(`data/${u}`)) || {};
+    return JSON.parse(localStorage.getItem(`tl_data_${u}`) || '{}');
+  } catch { return {}; }
+}
+async function saveData(u, d) {
+  if (USE_FIREBASE) await db.set(`data/${u}`, d);
+  else localStorage.setItem(`tl_data_${u}`, JSON.stringify(d));
+}
 
-// ── Mode ──
-let mode = 'signin'; // 'signin' | 'create'
+// Session — device-local only
+const SESS_KEY    = 'tl_sess_v1';
+const getSession  = () => { try { return localStorage.getItem(SESS_KEY); } catch { return null; } };
+const setSession  = u => localStorage.setItem(SESS_KEY, u);
+const clearSession= () => localStorage.removeItem(SESS_KEY);
+
+// ════════ DATE HELPERS ════════
+const pad      = n => String(n).padStart(2,'0');
+const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+const parseKey = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d); };
+const fmtFull  = k => parseKey(k).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+const fmtShort = k => { const d = parseKey(k); return { month: d.toLocaleDateString('en-US',{month:'short'}), day: d.getDate(), full: fmtFull(k) }; };
+const fmtMini  = k => parseKey(k).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const TODAY    = todayKey();
+
+// ════════ MODE TOGGLE ════════
+let mode = 'signin';
 function setMode(m) {
   mode = m;
   document.getElementById('toggleSignIn').classList.toggle('active', m === 'signin');
@@ -671,52 +730,63 @@ function setMode(m) {
   document.getElementById('nameInput').focus();
 }
 
-// ── Landing ──
+// ════════ LANDING AUTH ════════
 const nameInput = document.getElementById('nameInput');
 const pwInput   = document.getElementById('pwInput');
 const pcError   = document.getElementById('pcError');
 
 document.getElementById('pcBtn').addEventListener('click', tryAuth);
-nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') { pwInput.focus(); } });
-pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryAuth(); });
-
-function tryAuth() {
-  const raw = nameInput.value.trim();
-  const pw  = pwInput.value;
-  if (!raw) { showError('enter your name ✦'); nameInput.focus(); return; }
-  if (!pw)  { showError('enter a password ✦'); pwInput.focus(); return; }
-  const username = raw.toLowerCase().replace(/\s+/g, '_');
-  const displayName = raw;
-
-  const users = loadUsers();
-
-  if (mode === 'signin') {
-    if (!users[username]) { showError('no account found — create one?'); return; }
-    if (!users[username].password) {
-      // legacy account — set password now
-      users[username].password = pw;
-      saveUsers(users);
-    } else if (users[username].password !== pw) {
-      showError('wrong password ✦'); pwInput.value = ''; pwInput.focus(); return;
-    }
-    doLogin(username);
-  } else {
-    if (users[username]) { showError('name taken — try signing in?'); return; }
-    users[username] = { name: displayName, password: pw, created: Date.now() };
-    saveUsers(users);
-    doLogin(username);
-  }
-}
+nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') pwInput.focus(); });
+pwInput.addEventListener('keydown',   e => { if (e.key === 'Enter') tryAuth(); });
 
 function showError(msg) {
   pcError.textContent = msg;
   setTimeout(() => { pcError.textContent = '\u00a0'; }, 1800);
 }
 
+async function tryAuth() {
+  const raw = nameInput.value.trim();
+  const pw  = pwInput.value;
+  if (!raw) { showError('enter your name ✦'); nameInput.focus(); return; }
+  if (!pw)  { showError('enter a password ✦'); pwInput.focus(); return; }
+
+  const username    = raw.toLowerCase().replace(/\s+/g, '_');
+  const displayName = raw;
+  const btn = document.getElementById('pcBtn');
+  btn.disabled = true; btn.textContent = '…';
+
+  try {
+    const users = await loadUsers();
+
+    if (mode === 'signin') {
+      if (!users[username]) { showError('no account found — create one?'); return; }
+      if (!users[username].password) {
+        users[username].password = pw;
+        try { await saveUsers(users); } catch {}
+      } else if (users[username].password !== pw) {
+        showError('wrong password ✦'); pwInput.value = ''; pwInput.focus(); return;
+      }
+    } else {
+      if (users[username]) { showError('name taken — try signing in?'); return; }
+      users[username] = { name: displayName, password: pw, created: Date.now() };
+      try { await saveUsers(users); } catch(e) {
+        // Firebase failed but we saved locally — still let them in
+        console.warn('Firebase save failed, using local fallback:', e);
+      }
+    }
+    doLogin(username);
+  } catch(e) {
+    showError('something went wrong, try again ✦');
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = mode === 'signin' ? 'enter →' : 'create account →';
+  }
+}
+
 function doLogin(username) {
   setSession(username);
-  nameInput.value = '';
-  pwInput.value = '';
+  nameInput.value = ''; pwInput.value = '';
   document.getElementById('landing').classList.add('out');
   setTimeout(() => {
     document.getElementById('app').style.display = 'flex';
@@ -727,27 +797,17 @@ function doLogin(username) {
 
 function logout() {
   clearSession();
+  CURRENT_USER = null;
   document.getElementById('app').classList.remove('visible');
   document.getElementById('app').style.display = 'none';
   document.getElementById('landing').classList.remove('out');
-  nameInput.value = '';
-  pwInput.value = '';
+  nameInput.value = ''; pwInput.value = '';
 }
 
-// ── Date helpers ──
-const pad = n => String(n).padStart(2,'0');
-const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
-const parseKey = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d); };
-const fmtFull  = k => parseKey(k).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-const fmtShort = k => { const d = parseKey(k); return { month: d.toLocaleDateString('en-US',{month:'short'}), day: d.getDate(), full: fmtFull(k) }; };
-const fmtMini  = k => parseKey(k).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-
-// ── Streak ──
+// ════════ STREAK ════════
 function calcStreak(data) {
   const check = new Date();
-  const tk = todayKey();
-  // if no entry today, start streak from yesterday
-  if (!data[tk]) check.setDate(check.getDate() - 1);
+  if (!data[TODAY]) check.setDate(check.getDate() - 1);
   let streak = 0;
   while (true) {
     const k = `${check.getFullYear()}-${pad(check.getMonth()+1)}-${pad(check.getDate())}`;
@@ -756,40 +816,35 @@ function calcStreak(data) {
   }
   return streak;
 }
-
 function renderStreak(data) {
   const n = calcStreak(data);
-  const badge  = document.getElementById('streakBadge');
-  const numEl  = document.getElementById('streakNum');
-  numEl.textContent = n;
-  badge.classList.toggle('hot', n >= 3);
+  document.getElementById('streakNum').textContent = n;
+  document.getElementById('streakBadge').classList.toggle('hot', n >= 3);
 }
 
-// ── App init ──
+// ════════ APP INIT ════════
 let CURRENT_USER = null;
-const TODAY = todayKey();
 
-function initApp(username) {
+async function initApp(username) {
   CURRENT_USER = username;
-  const users = loadUsers();
+  const users = await loadUsers();
   const displayName = users[username]?.name || username;
 
-  // Update UI chrome
-  document.getElementById('greetName').textContent = displayName;
-  document.getElementById('sbAvatar').textContent  = displayName[0].toLowerCase();
-  document.getElementById('sbName').textContent    = displayName;
-  document.getElementById('sbLabel').textContent   = `${displayName}'s awesome life`;
+  document.getElementById('greetName').textContent  = displayName;
+  document.getElementById('sbAvatar').textContent   = displayName[0].toLowerCase();
+  document.getElementById('sbName').textContent     = displayName;
+  document.getElementById('sbLabel').textContent    = `${displayName}'s awesome life`;
   document.getElementById('todayLabel').textContent = fmtFull(TODAY);
 
-  const data = loadData(CURRENT_USER);
+  const data = await loadData(CURRENT_USER);
   if (data[TODAY]) showTodayEntry(data[TODAY].raw, data[TODAY].summary);
-  renderFeed();
-  renderSpine();
+  renderFeed(data);
+  renderSpine(data);
   renderStreak(data);
   initScrollFill();
 }
 
-// ── Entry ──
+// ════════ ENTRY ════════
 const entryInput  = document.getElementById('entryInput');
 const archiveBtn  = document.getElementById('archiveBtn');
 const summarizing = document.getElementById('summarizing');
@@ -806,17 +861,17 @@ archiveBtn.addEventListener('click', async () => {
   summarizing.classList.add('on');
   const summary = await summarize(raw, CURRENT_USER);
   summarizing.classList.remove('on');
-  const data = loadData(CURRENT_USER);
+  const data = await loadData(CURRENT_USER);
   data[TODAY] = { raw, summary, ts: Date.now() };
-  saveData(CURRENT_USER, data);
+  await saveData(CURRENT_USER, data);
   showTodayEntry(raw, summary);
-  renderFeed();
-  renderSpine();
+  renderFeed(data);
+  renderSpine(data);
   renderStreak(data);
 });
 
-document.getElementById('editBtn').addEventListener('click', () => {
-  const d = loadData(CURRENT_USER);
+document.getElementById('editBtn').addEventListener('click', async () => {
+  const d = await loadData(CURRENT_USER);
   if (d[TODAY]) {
     entryInput.value = d[TODAY].raw;
     archiveBtn.disabled = false;
@@ -832,9 +887,9 @@ function showTodayEntry(raw, summary) {
   document.getElementById('sbTodayText').textContent = summary;
 }
 
-// ── Summarize ──
+// ════════ SUMMARIZE ════════
 async function summarize(text, username) {
-  const users = loadUsers();
+  const users = await loadUsers();
   const name  = users[username]?.name || username;
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -853,18 +908,12 @@ async function summarize(text, username) {
   }
 }
 
-// ── Feed ──
-function renderFeed() {
-  const data = loadData(CURRENT_USER);
+// ════════ FEED ════════
+function renderFeed(data) {
   const keys = Object.keys(data).sort((a,b)=>b.localeCompare(a)).filter(k=>k!==TODAY);
   const feed = document.getElementById('feed');
   feed.innerHTML = '';
-
-  if (!keys.length) {
-    feed.innerHTML = '<p class="empty">your days will appear here ✦</p>';
-    return;
-  }
-
+  if (!keys.length) { feed.innerHTML = '<p class="empty">your days will appear here ✦</p>'; return; }
   keys.forEach((key, i) => {
     const e = data[key];
     const { month, day, full } = fmtShort(key);
@@ -875,22 +924,17 @@ function renderFeed() {
     item.innerHTML = `
       <div class="fi-date"><div class="fi-month">${month}</div><div class="fi-day">${day}</div></div>
       <div class="fi-connector"><div class="fi-dot"></div><div class="fi-line"></div></div>
-      <div class="fi-body">
-        <p class="fi-summary">${e.summary}</p>
-        <p class="fi-raw">\u201c${e.raw}\u201d</p>
-      </div>`;
+      <div class="fi-body"><p class="fi-summary">${e.summary}</p><p class="fi-raw">\u201c${e.raw}\u201d</p></div>`;
     item.addEventListener('click', () => openModal(full, e.summary, e.raw));
     feed.appendChild(item);
   });
 }
 
-// ── Sidebar spine ──
-function renderSpine() {
-  const data = loadData(CURRENT_USER);
+// ════════ SIDEBAR SPINE ════════
+function renderSpine(data) {
   const keys = Object.keys(data).sort((a,b)=>b.localeCompare(a)).filter(k=>k!==TODAY);
   const list = document.getElementById('spineList');
   list.innerHTML = '';
-
   keys.forEach(key => {
     const e = data[key];
     const item = document.createElement('div');
@@ -905,41 +949,38 @@ function renderSpine() {
   });
 }
 
-// ── Scroll-driven spine fill ──
+// ════════ SCROLL FILL ════════
 function initScrollFill() {
   const fill = document.getElementById('spineFill');
   window.addEventListener('scroll', () => {
     const pct = document.body.scrollHeight > window.innerHeight
-      ? Math.min(100, window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100)
-      : 0;
+      ? Math.min(100, window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) : 0;
     fill.style.height = pct + '%';
     document.querySelectorAll('.spine-item').forEach(si => {
       const el = document.querySelector(`.feed-item[data-key="${si.dataset.key}"]`);
-      if (el) {
-        const r = el.getBoundingClientRect();
-        si.classList.toggle('active', r.top < window.innerHeight * 0.55 && r.bottom > 0);
-      }
+      if (el) { const r = el.getBoundingClientRect(); si.classList.toggle('active', r.top < window.innerHeight * 0.55 && r.bottom > 0); }
     });
   }, { passive: true });
 }
 
 function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-// ── Modal ──
+// ════════ MODAL ════════
 function openModal(date, summary, raw) {
-  document.getElementById('mDate').textContent = date;
+  document.getElementById('mDate').textContent    = date;
   document.getElementById('mSummary').textContent = summary;
-  document.getElementById('mRaw').textContent = '\u201c' + raw + '\u201d';
+  document.getElementById('mRaw').textContent     = '\u201c' + raw + '\u201d';
   document.getElementById('overlay').classList.add('open');
 }
 function bgClose(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 function closeModal() { document.getElementById('overlay').classList.remove('open'); }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// ── Boot ──
-const sess = getSession();
-if (sess) {
-  const users = loadUsers();
+// ════════ BOOT ════════
+(async () => {
+  const sess = getSession();
+  if (!sess) return;
+  const users = await loadUsers();
   if (users[sess]) {
     document.getElementById('landing').classList.add('out');
     document.getElementById('app').style.display = 'flex';
@@ -948,7 +989,7 @@ if (sess) {
   } else {
     clearSession();
   }
-}
+})();
 </script>
 </body>
 </html>
