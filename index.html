@@ -66,7 +66,7 @@ body::after {
   line-height: 1;
   margin-bottom: 0.4rem;
 }
-.landing-wordmark span { color: var(--accent); font-style: italic; }
+.landing-wordmark span { color: var(--accent); }
 
 .landing-sub {
   font-size: 0.82rem;
@@ -77,7 +77,6 @@ body::after {
   margin-bottom: 3.5rem;
 }
 
-/* mode toggle */
 .landing-toggle {
   display: flex;
   justify-content: center;
@@ -103,10 +102,7 @@ body::after {
   cursor: pointer;
   transition: all 0.2s;
 }
-.toggle-btn.active {
-  background: rgba(255,255,255,0.1);
-  color: var(--cream);
-}
+.toggle-btn.active { background: rgba(255,255,255,0.1); color: var(--cream); }
 
 .landing-input {
   display: block;
@@ -160,7 +156,6 @@ body::after {
 #app { display: none; min-height: 100vh; }
 #app.visible { display: flex; }
 
-/* ── Sidebar ── */
 .sidebar {
   position: fixed;
   left: 0; top: 0; bottom: 0;
@@ -232,7 +227,6 @@ body::after {
   transition: background 0.15s;
 }
 .spine-item:hover { background: rgba(255,255,255,0.04); }
-
 .spine-item::before {
   content: '';
   position: absolute;
@@ -244,8 +238,7 @@ body::after {
   border: 1.5px solid rgba(255,255,255,0.25);
   transition: all 0.2s;
 }
-.spine-item:hover::before,
-.spine-item.active::before {
+.spine-item:hover::before, .spine-item.active::before {
   background: var(--accent);
   border-color: var(--accent);
   transform: translateY(-50%) scale(1.35);
@@ -314,7 +307,6 @@ body::after {
 }
 .btn-logout:hover { color: rgba(255,255,255,0.55); }
 
-/* ── Main ── */
 .main {
   margin-left: var(--sidebar-w);
   flex: 1;
@@ -322,11 +314,7 @@ body::after {
   padding: 0 2.8rem 6rem;
 }
 
-.app-header {
-  padding: 3.5rem 0 2.5rem;
-  animation: fadeDown 0.7s ease both;
-}
-.app-header-left { flex: 1; }
+.app-header { padding: 3.5rem 0 2.5rem; animation: fadeDown 0.7s ease both; }
 .greeting {
   font-family: 'Instrument Serif', serif;
   font-size: clamp(2.4rem, 5vw, 3.8rem);
@@ -336,51 +324,32 @@ body::after {
 .greeting em { font-style: italic; color: var(--accent); }
 .subline { margin-top: 0.5rem; font-size: 0.88rem; color: var(--bark); font-weight: 300; }
 
-/* ── Streak badge ── */
 .streak-badge {
   position: fixed;
-  top: 1.1rem;
-  right: 1.3rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.05rem;
+  top: 1.1rem; right: 1.3rem;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.05rem;
   animation: fadeDown 0.7s 0.15s ease both;
-  z-index: 90;
-  text-align: right;
+  z-index: 90; text-align: right;
 }
 .streak-num {
   font-family: 'Instrument Serif', serif;
-  font-size: 2rem;
-  line-height: 1;
-  color: var(--soft-ink);
-  transition: color 0.3s;
+  font-size: 2rem; line-height: 1;
+  color: var(--soft-ink); transition: color 0.3s;
 }
 .streak-badge.hot .streak-num { color: var(--accent); }
 .streak-label {
-  font-size: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--bark);
-  font-weight: 500;
-  transition: color 0.3s;
+  font-size: 0.5rem; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--bark); font-weight: 500;
 }
 .streak-badge.hot .streak-label { color: var(--accent-light); }
 
-/* section label */
 .sec-label {
-  font-size: 0.63rem;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--bark);
-  font-weight: 500;
-  margin-bottom: 0.9rem;
+  font-size: 0.63rem; text-transform: uppercase;
+  letter-spacing: 0.14em; color: var(--bark); font-weight: 500; margin-bottom: 0.9rem;
 }
 
-/* today card */
 .today-card {
-  background: white;
-  border-radius: 18px;
+  background: white; border-radius: 18px;
   padding: 1.6rem 1.8rem;
   border: 1px solid var(--sand);
   box-shadow: 0 2px 22px rgba(34,28,21,0.05);
@@ -399,17 +368,8 @@ body::after {
 
 .form-footer {
   display: flex; justify-content: space-between; align-items: center;
-  margin-top: 1rem; padding-top: 1rem;
-  border-top: 1px solid var(--sand);
+  margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--sand);
 }
-
-.summarizing {
-  display: none; font-size: 0.8rem;
-  color: var(--accent); font-style: italic;
-}
-.summarizing.on { display: block; animation: breathe 1.5s ease-in-out infinite; }
-
-@keyframes breathe { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
 .btn-archive {
   background: var(--ink); color: var(--cream);
@@ -439,30 +399,25 @@ body::after {
 }
 .disp-summary {
   font-family: 'Instrument Serif', serif;
-  font-size: 1.3rem; line-height: 1.45;
-  color: var(--ink); margin-bottom: 0.5rem;
+  font-size: 1.3rem; line-height: 1.45; color: var(--ink); margin-bottom: 0.5rem;
 }
 .disp-raw { font-size: 0.8rem; color: var(--bark); font-style: italic; line-height: 1.5; margin-bottom: 0.9rem; }
 .btn-edit {
   background: none; border: 1px solid var(--sand);
   color: var(--soft-ink); padding: 0.28rem 1rem;
   border-radius: 100px; font-family: 'DM Sans', sans-serif;
-  font-size: 0.7rem; cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  font-size: 0.7rem; cursor: pointer; transition: border-color 0.15s, color 0.15s;
 }
 .btn-edit:hover { border-color: var(--accent); color: var(--accent); }
 
-/* ── Past feed ── */
 .past-section { animation: fadeUp 0.9s 0.2s ease both; }
 .feed { display: flex; flex-direction: column; }
 .empty { text-align: center; padding: 4rem 0 2rem; color: var(--bark); font-size: 0.86rem; font-style: italic; }
 
 .feed-item {
   display: flex; gap: 1.6rem;
-  padding: 1.5rem 0;
-  border-bottom: 1px solid var(--sand);
-  cursor: pointer;
-  position: relative;
+  padding: 1.5rem 0; border-bottom: 1px solid var(--sand);
+  cursor: pointer; position: relative;
 }
 .feed-item:last-child { border-bottom: none; }
 .feed-item:hover { background: rgba(201,120,74,0.025); margin: 0 -0.5rem; padding: 1.5rem 0.5rem; border-radius: 8px; }
@@ -475,8 +430,7 @@ body::after {
 .fi-dot {
   width: 9px; height: 9px; border-radius: 50%;
   background: var(--sand); border: 2px solid var(--bark);
-  flex-shrink: 0; z-index: 1;
-  transition: all 0.2s;
+  flex-shrink: 0; z-index: 1; transition: all 0.2s;
 }
 .feed-item:hover .fi-dot { background: var(--accent-light); border-color: var(--accent); transform: scale(1.3); }
 .fi-line { flex: 1; width: 1px; background: var(--sand); margin-top: 5px; }
@@ -485,8 +439,7 @@ body::after {
 .fi-body { flex: 1; }
 .fi-summary {
   font-family: 'Instrument Serif', serif;
-  font-size: 1.05rem; color: var(--ink); line-height: 1.4;
-  transition: color 0.2s;
+  font-size: 1.05rem; color: var(--ink); line-height: 1.4; transition: color 0.2s;
 }
 .feed-item:hover .fi-summary { color: var(--accent); }
 .fi-raw {
@@ -497,23 +450,17 @@ body::after {
 }
 .feed-item.open .fi-raw { max-height: 120px; opacity: 1; }
 
-/* ═══ Modal ═══ */
 .overlay {
   position: fixed; inset: 0;
-  background: rgba(34,28,21,0.5);
-  backdrop-filter: blur(6px);
+  background: rgba(34,28,21,0.5); backdrop-filter: blur(6px);
   z-index: 500;
   display: flex; align-items: center; justify-content: center;
-  padding: 1.5rem;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.25s;
+  padding: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 0.25s;
 }
 .overlay.open { opacity: 1; pointer-events: all; }
 
 .modal {
-  background: var(--cream);
-  border-radius: 22px;
-  padding: 2.2rem;
+  background: var(--cream); border-radius: 22px; padding: 2.2rem;
   max-width: 450px; width: 100%;
   box-shadow: 0 30px 80px rgba(34,28,21,0.22);
   transform: translateY(16px) scale(0.97);
@@ -533,7 +480,6 @@ body::after {
 }
 .btn-mclose:hover { background: var(--accent); }
 
-/* ── Animations ── */
 @keyframes fadeDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
 @keyframes fadeUp   { from{opacity:0;transform:translateY(12px)}  to{opacity:1;transform:translateY(0)} }
 @keyframes popIn    { from{transform:scale(0)} to{transform:scale(1)} }
@@ -552,7 +498,7 @@ body::after {
 <div id="landing">
   <div class="landing-inner">
     <h1 class="landing-wordmark">timeline<span>.</span></h1>
-    <p class="landing-sub">one line · every day · forever</p>
+    <p class="landing-sub">one highlight · every day · forever</p>
 
     <div class="landing-toggle">
       <button class="toggle-btn active" id="toggleSignIn" onclick="setMode('signin')">sign in</button>
@@ -569,26 +515,23 @@ body::after {
 
 <!-- APP -->
 <div id="app">
-  <!-- streak badge lives here so fixed positioning isn't trapped by parent transforms -->
   <div class="streak-badge" id="streakBadge">
     <div class="streak-num" id="streakNum">0</div>
     <div class="streak-label">day streak</div>
   </div>
+
   <aside class="sidebar">
     <div class="sidebar-logo"><em>timeline.</em></div>
-    <div class="sb-label" id="sbLabel">your awesome life</div>
-
-    <div class="spine-wrap" id="spineWrap">
+    <div class="sb-label" id="sbLabel">your timeline</div>
+    <div class="spine-wrap">
       <div class="spine-track"></div>
       <div class="spine-fill" id="spineFill"></div>
       <div class="spine-list" id="spineList"></div>
     </div>
-
-    <div class="sb-today" id="sbToday" onclick="scrollToTop()">
+    <div class="sb-today" onclick="scrollToTop()">
       <div class="sb-today-label">↑ today</div>
       <div class="sb-today-text" id="sbTodayText">write something…</div>
     </div>
-
     <div class="sb-user">
       <div class="sb-avatar" id="sbAvatar">?</div>
       <span class="sb-name" id="sbName">—</span>
@@ -596,20 +539,18 @@ body::after {
     </div>
   </aside>
 
-  <main class="main" id="mainArea">
+  <main class="main">
     <header class="app-header">
-      <div class="app-header-left">
-        <h1 class="greeting">hi, <em id="greetName">there</em> ✦</h1>
-        <p class="subline">one thing a day — your life, in your own words</p>
-      </div>
+      <h1 class="greeting">hi, <em id="greetName">there</em> ✦</h1>
+      <p class="subline">one highlight every day, forever</p>
     </header>
 
     <div class="sec-label">today — <span id="todayLabel"></span></div>
     <div class="today-card" id="todayCard">
       <div class="entry-form">
-        <textarea id="entryInput" maxlength="500" placeholder="what happened today? anything counts…" rows="3"></textarea>
+        <textarea id="entryInput" maxlength="500" placeholder="what was your highlight today?" rows="3"></textarea>
         <div class="form-footer">
-          <span class="summarizing" id="summarizing">✦ distilling your day…</span>
+          <span style="font-size:0.8rem;color:var(--bark);font-style:italic;display:none" id="savingMsg">saving…</span>
           <button class="btn-archive" id="archiveBtn" disabled>archive it</button>
         </div>
       </div>
@@ -624,7 +565,7 @@ body::after {
     <div class="past-section">
       <div class="sec-label">your story so far</div>
       <div class="feed" id="feed">
-        <p class="empty" id="emptyMsg">your days will appear here ✦</p>
+        <p class="empty">your days will appear here ✦</p>
       </div>
     </div>
   </main>
@@ -669,13 +610,13 @@ async function loadUsers() {
   return JSON.parse(localStorage.getItem('tl_users_cache') || '{}');
 }
 async function saveUsers(u) {
-  await db.set('users', u); // throws if Firebase fails — intentional
+  await db.set('users', u);
   localStorage.setItem('tl_users_cache', JSON.stringify(u));
 }
 async function loadData(u) {
   try {
     const data = await db.get(`data/${u}`);
-    if (data) return data;
+    if (data) { localStorage.setItem(`tl_data_${u}`, JSON.stringify(data)); return data; }
   } catch {}
   return JSON.parse(localStorage.getItem(`tl_data_${u}`) || '{}');
 }
@@ -684,13 +625,11 @@ async function saveData(u, d) {
   localStorage.setItem(`tl_data_${u}`, JSON.stringify(d));
 }
 
-// Session — device-local only
 const SESS_KEY    = 'tl_sess_v1';
 const getSession  = () => { try { return localStorage.getItem(SESS_KEY); } catch { return null; } };
 const setSession  = u => localStorage.setItem(SESS_KEY, u);
 const clearSession= () => localStorage.removeItem(SESS_KEY);
 
-// ════════ DATE HELPERS ════════
 const pad      = n => String(n).padStart(2,'0');
 const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
 const parseKey = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d); };
@@ -699,7 +638,6 @@ const fmtShort = k => { const d = parseKey(k); return { month: d.toLocaleDateStr
 const fmtMini  = k => parseKey(k).toLocaleDateString('en-US',{month:'short',day:'numeric'});
 const TODAY    = todayKey();
 
-// ════════ MODE TOGGLE ════════
 let mode = 'signin';
 function setMode(m) {
   mode = m;
@@ -711,7 +649,6 @@ function setMode(m) {
   document.getElementById('nameInput').focus();
 }
 
-// ════════ LANDING AUTH ════════
 const nameInput = document.getElementById('nameInput');
 const pwInput   = document.getElementById('pwInput');
 const pcError   = document.getElementById('pcError');
@@ -738,23 +675,18 @@ async function tryAuth() {
 
   try {
     const users = await loadUsers();
-
     if (mode === 'signin') {
       if (!users[username]) { showError('no account found — create one?'); return; }
-      if (!users[username].password) {
-        users[username].password = pw;
-        await saveUsers(users);
-      } else if (users[username].password !== pw) {
-        showError('wrong password ✦'); pwInput.value = ''; pwInput.focus(); return;
-      }
+      if (users[username].password !== pw) { showError('wrong password ✦'); pwInput.value = ''; pwInput.focus(); return; }
     } else {
       if (users[username]) { showError('name taken — try signing in?'); return; }
       users[username] = { name: displayName, password: pw, created: Date.now() };
-      await saveUsers(users); // will throw + show error if Firebase is down
+      await saveUsers(users);
     }
-    doLogin(username);
+    setSession(username);
+    doLogin(username, users[username].name || displayName);
   } catch(e) {
-    showError('couldn\'t reach the server — check Firebase rules ✦');
+    showError('couldn\'t reach the server ✦');
     console.error(e);
   } finally {
     btn.disabled = false;
@@ -762,27 +694,26 @@ async function tryAuth() {
   }
 }
 
-function doLogin(username) {
-  setSession(username);
+function doLogin(username, displayName) {
   nameInput.value = ''; pwInput.value = '';
   document.getElementById('landing').classList.add('out');
   setTimeout(() => {
     document.getElementById('app').style.display = 'flex';
     document.getElementById('app').classList.add('visible');
-    initApp(username);
+    initApp(username, displayName);
   }, 680);
 }
 
 function logout() {
   clearSession();
   CURRENT_USER = null;
+  CURRENT_NAME = null;
   document.getElementById('app').classList.remove('visible');
   document.getElementById('app').style.display = 'none';
   document.getElementById('landing').classList.remove('out');
   nameInput.value = ''; pwInput.value = '';
 }
 
-// ════════ STREAK ════════
 function calcStreak(data) {
   const check = new Date();
   if (!data[TODAY]) check.setDate(check.getDate() - 1);
@@ -800,33 +731,30 @@ function renderStreak(data) {
   document.getElementById('streakBadge').classList.toggle('hot', n >= 3);
 }
 
-// ════════ APP INIT ════════
 let CURRENT_USER = null;
+let CURRENT_NAME = null;
 
-async function initApp(username) {
+async function initApp(username, displayName) {
   CURRENT_USER = username;
-  const users = await loadUsers();
-  const displayName = users[username]?.name || username;
-
+  CURRENT_NAME = displayName;
   document.getElementById('greetName').textContent  = displayName;
   document.getElementById('sbAvatar').textContent   = displayName[0].toLowerCase();
   document.getElementById('sbName').textContent     = displayName;
-  document.getElementById('sbLabel').textContent    = `${displayName}'s awesome life`;
+  document.getElementById('sbLabel').textContent    = `${displayName}'s timeline`;
   document.getElementById('todayLabel').textContent = fmtFull(TODAY);
 
   const data = await loadData(username);
-  if (data[TODAY]) showTodayEntry(data[TODAY].raw, data[TODAY].summary);
+  if (data[TODAY]) showTodayEntry(data[TODAY].raw);
   renderFeed(data);
   renderSpine(data);
   renderStreak(data);
   initScrollFill();
 }
 
-// ════════ ENTRY ════════
-const entryInput  = document.getElementById('entryInput');
-const archiveBtn  = document.getElementById('archiveBtn');
-const summarizing = document.getElementById('summarizing');
-const todayCard   = document.getElementById('todayCard');
+const entryInput = document.getElementById('entryInput');
+const archiveBtn = document.getElementById('archiveBtn');
+const todayCard  = document.getElementById('todayCard');
+const savingMsg  = document.getElementById('savingMsg');
 
 entryInput.addEventListener('input', () => {
   archiveBtn.disabled = entryInput.value.trim().length < 3;
@@ -836,16 +764,23 @@ archiveBtn.addEventListener('click', async () => {
   const raw = entryInput.value.trim();
   if (!raw) return;
   archiveBtn.disabled = true;
-  summarizing.classList.add('on');
-  const summary = await summarize(raw, CURRENT_USER);
-  summarizing.classList.remove('on');
-  const data = await loadData(CURRENT_USER);
-  data[TODAY] = { raw, summary, ts: Date.now() };
-  await saveData(CURRENT_USER, data);
-  showTodayEntry(raw, summary);
-  renderFeed(data);
-  renderSpine(data);
-  renderStreak(data);
+  savingMsg.style.display = 'block';
+
+  try {
+    const data = await loadData(CURRENT_USER);
+    data[TODAY] = { raw, ts: Date.now() };
+    await saveData(CURRENT_USER, data);
+    showTodayEntry(raw);
+    renderFeed(data);
+    renderSpine(data);
+    renderStreak(data);
+  } catch(e) {
+    alert('couldn\'t save — check your connection ✦');
+    archiveBtn.disabled = false;
+    console.error(e);
+  } finally {
+    savingMsg.style.display = 'none';
+  }
 });
 
 document.getElementById('editBtn').addEventListener('click', async () => {
@@ -858,35 +793,13 @@ document.getElementById('editBtn').addEventListener('click', async () => {
   }
 });
 
-function showTodayEntry(raw, summary) {
-  document.getElementById('dispSummary').textContent = summary;
-  document.getElementById('dispRaw').textContent = '\u201c' + raw + '\u201d';
+function showTodayEntry(raw) {
+  document.getElementById('dispSummary').textContent = raw;
+  document.getElementById('dispRaw').textContent = '';
   todayCard.classList.add('has-entry');
-  document.getElementById('sbTodayText').textContent = summary;
+  document.getElementById('sbTodayText').textContent = raw.length > 55 ? raw.slice(0,52)+'…' : raw;
 }
 
-// ════════ SUMMARIZE ════════
-async function summarize(text, username) {
-  const users = await loadUsers();
-  const name  = users[username]?.name || username;
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: `You are helping someone named ${name} capture their life in beautiful, meaningful one-liners. They wrote about their day:\n\n"${text}"\n\nWrite a single poetic, warm, first-person sentence (10–20 words) that captures the essence of what they did. Make it feel personal, reflective, and memorable. No quotes, no preamble, just the sentence.` }]
-      })
-    });
-    const d = await res.json();
-    return d.content?.[0]?.text?.trim() || text;
-  } catch {
-    return text.length > 90 ? text.slice(0,87)+'…' : text;
-  }
-}
-
-// ════════ FEED ════════
 function renderFeed(data) {
   const keys = Object.keys(data).sort((a,b)=>b.localeCompare(a)).filter(k=>k!==TODAY);
   const feed = document.getElementById('feed');
@@ -902,13 +815,12 @@ function renderFeed(data) {
     item.innerHTML = `
       <div class="fi-date"><div class="fi-month">${month}</div><div class="fi-day">${day}</div></div>
       <div class="fi-connector"><div class="fi-dot"></div><div class="fi-line"></div></div>
-      <div class="fi-body"><p class="fi-summary">${e.summary}</p><p class="fi-raw">\u201c${e.raw}\u201d</p></div>`;
-    item.addEventListener('click', () => openModal(full, e.summary, e.raw));
+      <div class="fi-body"><p class="fi-summary">${e.raw}</p></div>`;
+    item.addEventListener('click', () => openModal(full, e.raw));
     feed.appendChild(item);
   });
 }
 
-// ════════ SIDEBAR SPINE ════════
 function renderSpine(data) {
   const keys = Object.keys(data).sort((a,b)=>b.localeCompare(a)).filter(k=>k!==TODAY);
   const list = document.getElementById('spineList');
@@ -918,7 +830,7 @@ function renderSpine(data) {
     const item = document.createElement('div');
     item.className = 'spine-item';
     item.dataset.key = key;
-    item.innerHTML = `<div class="spine-date">${fmtMini(key)}</div><div class="spine-text">${e.summary}</div>`;
+    item.innerHTML = `<div class="spine-date">${fmtMini(key)}</div><div class="spine-text">${e.raw}</div>`;
     item.addEventListener('click', () => {
       const el = document.querySelector(`.feed-item[data-key="${key}"]`);
       if (el) { el.scrollIntoView({ behavior:'smooth', block:'center' }); el.classList.add('open'); setTimeout(()=>el.classList.remove('open'), 2200); }
@@ -927,7 +839,6 @@ function renderSpine(data) {
   });
 }
 
-// ════════ SCROLL FILL ════════
 function initScrollFill() {
   const fill = document.getElementById('spineFill');
   window.addEventListener('scroll', () => {
@@ -943,18 +854,16 @@ function initScrollFill() {
 
 function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
-// ════════ MODAL ════════
-function openModal(date, summary, raw) {
+function openModal(date, text) {
   document.getElementById('mDate').textContent    = date;
-  document.getElementById('mSummary').textContent = summary;
-  document.getElementById('mRaw').textContent     = '\u201c' + raw + '\u201d';
+  document.getElementById('mSummary').textContent = text;
+  document.getElementById('mRaw').textContent     = '';
   document.getElementById('overlay').classList.add('open');
 }
 function bgClose(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 function closeModal() { document.getElementById('overlay').classList.remove('open'); }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// ════════ BOOT ════════
 (async () => {
   const sess = getSession();
   if (!sess) return;
@@ -963,358 +872,11 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
     document.getElementById('landing').classList.add('out');
     document.getElementById('app').style.display = 'flex';
     document.getElementById('app').classList.add('visible');
-    initApp(sess);
+    initApp(sess, users[sess].name || sess);
   } else {
     clearSession();
   }
 })();
-</script>
-</body>
-</html>
-
-const db = {
-  async get(path) {
-    try {
-      const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`);
-      if (!res.ok) return null;
-      return res.json();
-    } catch { return null; }
-  },
-  async set(path, val) {
-    try {
-      await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(val)
-      });
-    } catch {}
-  }
-};
-
-async function loadUsers() {
-  if (USE_FIREBASE) {
-    const d = await db.get('users');
-    if (d) { localStorage.setItem('tl_users_cache', JSON.stringify(d)); return d; }
-  }
-  return JSON.parse(localStorage.getItem('tl_users') || localStorage.getItem('tl_users_cache') || '{}');
-}
-async function saveUsers(u) {
-  localStorage.setItem('tl_users_cache', JSON.stringify(u));
-  if (USE_FIREBASE) await db.set('users', u);
-  else localStorage.setItem('tl_users', JSON.stringify(u));
-}
-async function loadData(u) {
-  if (USE_FIREBASE) {
-    const d = await db.get(`data/${u}`);
-    if (d) return d;
-  }
-  return JSON.parse(localStorage.getItem(`tl_data_${u}`) || '{}');
-}
-async function saveData(u, d) {
-  if (USE_FIREBASE) await db.set(`data/${u}`, d);
-  else localStorage.setItem(`tl_data_${u}`, JSON.stringify(d));
-}
-
-// ════════ SESSION ════════
-const SESS_KEY   = 'tl_sess_v1';
-const getSession  = () => localStorage.getItem(SESS_KEY);
-const setSession  = u => localStorage.setItem(SESS_KEY, u);
-const clearSession= () => localStorage.removeItem(SESS_KEY);
-
-// ════════ DATE HELPERS ════════
-const pad      = n => String(n).padStart(2,'0');
-const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
-const parseKey = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d); };
-const fmtFull  = k => parseKey(k).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-const fmtShort = k => { const d = parseKey(k); return { month: d.toLocaleDateString('en-US',{month:'short'}), day: d.getDate(), full: fmtFull(k) }; };
-const fmtMini  = k => parseKey(k).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-const TODAY    = todayKey();
-
-// ════════ MODE TOGGLE ════════
-let mode = 'signin';
-function setMode(m) {
-  mode = m;
-  document.getElementById('toggleSignIn').classList.toggle('active', m === 'signin');
-  document.getElementById('toggleCreate').classList.toggle('active', m === 'create');
-  document.getElementById('pcBtn').textContent = m === 'signin' ? 'enter →' : 'create account →';
-  document.getElementById('landingHint').textContent = m === 'signin' ? 'sign in with your name & password' : 'pick a name and a password';
-  document.getElementById('pcError').textContent = '\u00a0';
-  document.getElementById('nameInput').focus();
-}
-
-// ════════ LANDING AUTH ════════
-const nameInput = document.getElementById('nameInput');
-const pwInput   = document.getElementById('pwInput');
-const pcError   = document.getElementById('pcError');
-
-document.getElementById('pcBtn').addEventListener('click', tryAuth);
-nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') pwInput.focus(); });
-pwInput.addEventListener('keydown',   e => { if (e.key === 'Enter') tryAuth(); });
-
-function showError(msg) {
-  pcError.textContent = msg;
-  setTimeout(() => { pcError.textContent = '\u00a0'; }, 2200);
-}
-
-async function tryAuth() {
-  const raw = nameInput.value.trim();
-  const pw  = pwInput.value;
-  if (!raw) { showError('enter your name ✦'); nameInput.focus(); return; }
-  if (!pw)  { showError('enter a password ✦'); pwInput.focus(); return; }
-
-  const username    = raw.toLowerCase().replace(/\s+/g, '_');
-  const displayName = raw;
-  const email       = `${username}@timeline.app`; // fake email for Firebase Auth
-  const btn = document.getElementById('pcBtn');
-  btn.disabled = true; btn.textContent = '…';
-
-  try {
-    if (mode === 'create') {
-      // Check username isn't taken
-      const existingUid = await getUsernameUid(username);
-      if (existingUid) { showError('name taken — try signing in?'); return; }
-
-      // Create Firebase Auth account
-      const cred = await auth.createUserWithEmailAndPassword(email, pw);
-      const uid  = cred.user.uid;
-
-      // Save username → uid index + profile
-      await setUsernameUid(username, uid);
-      await saveUserProfile(uid, { name: displayName, username, created: Date.now() });
-
-      setSession(uid);
-      doLogin(uid, displayName);
-    } else {
-      // Look up uid from username
-      const uid = await getUsernameUid(username);
-      if (!uid) { showError('no account found — create one?'); return; }
-
-      await auth.signInWithEmailAndPassword(email, pw);
-      const profile = await loadUserProfile(uid);
-
-      setSession(uid);
-      doLogin(uid, profile.name || displayName);
-    }
-  } catch (e) {
-    if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-      showError('wrong password ✦'); pwInput.value = ''; pwInput.focus();
-    } else if (e.code === 'auth/weak-password') {
-      showError('password must be 6+ characters ✦');
-    } else if (e.code === 'auth/network-request-failed') {
-      showError('no internet connection ✦');
-    } else {
-      showError('something went wrong ✦');
-      console.error(e);
-    }
-  } finally {
-    btn.disabled = false;
-    btn.textContent = mode === 'signin' ? 'enter →' : 'create account →';
-  }
-}
-
-function doLogin(uid, displayName) {
-  nameInput.value = ''; pwInput.value = '';
-  document.getElementById('landing').classList.add('out');
-  setTimeout(() => {
-    document.getElementById('app').style.display = 'flex';
-    document.getElementById('app').classList.add('visible');
-    initApp(uid, displayName);
-  }, 680);
-}
-
-async function logout() {
-  await auth.signOut();
-  clearSession();
-  CURRENT_USER = null;
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('landing').classList.remove('out');
-  nameInput.value = ''; pwInput.value = '';
-}
-
-// ════════ STREAK ════════
-function calcStreak(data) {
-  const check = new Date();
-  if (!data[TODAY]) check.setDate(check.getDate() - 1);
-  let streak = 0;
-  while (true) {
-    const k = `${check.getFullYear()}-${pad(check.getMonth()+1)}-${pad(check.getDate())}`;
-    if (data[k]) { streak++; check.setDate(check.getDate() - 1); }
-    else break;
-  }
-  return streak;
-}
-function renderStreak(data) {
-  const n = calcStreak(data);
-  document.getElementById('streakNum').textContent = n;
-  document.getElementById('streakBadge').classList.toggle('hot', n >= 3);
-}
-
-// ════════ APP INIT ════════
-let CURRENT_USER = null; // stores uid
-
-async function initApp(uid, displayName) {
-  CURRENT_USER = uid;
-  document.getElementById('greetName').textContent  = displayName;
-  document.getElementById('sbAvatar').textContent   = displayName[0].toLowerCase();
-  document.getElementById('sbName').textContent     = displayName;
-  document.getElementById('sbLabel').textContent    = `${displayName}'s awesome life`;
-  document.getElementById('todayLabel').textContent = fmtFull(TODAY);
-
-  const data = await loadData(uid);
-  if (data[TODAY]) showTodayEntry(data[TODAY].raw, data[TODAY].summary);
-  renderFeed(data);
-  renderSpine(data);
-  renderStreak(data);
-  initScrollFill();
-}
-
-// ════════ ENTRY ════════
-const entryInput  = document.getElementById('entryInput');
-const archiveBtn  = document.getElementById('archiveBtn');
-const summarizing = document.getElementById('summarizing');
-const todayCard   = document.getElementById('todayCard');
-
-entryInput.addEventListener('input', () => {
-  archiveBtn.disabled = entryInput.value.trim().length < 3;
-});
-
-archiveBtn.addEventListener('click', async () => {
-  const raw = entryInput.value.trim();
-  if (!raw) return;
-  archiveBtn.disabled = true;
-  summarizing.classList.add('on');
-  const summary = await summarize(raw);
-  summarizing.classList.remove('on');
-  const data = await loadData(CURRENT_USER);
-  data[TODAY] = { raw, summary, ts: Date.now() };
-  await saveData(CURRENT_USER, data);
-  showTodayEntry(raw, summary);
-  renderFeed(data);
-  renderSpine(data);
-  renderStreak(data);
-});
-
-document.getElementById('editBtn').addEventListener('click', async () => {
-  const d = await loadData(CURRENT_USER);
-  if (d[TODAY]) {
-    entryInput.value = d[TODAY].raw;
-    archiveBtn.disabled = false;
-    todayCard.classList.remove('has-entry');
-    entryInput.focus();
-  }
-});
-
-function showTodayEntry(raw, summary) {
-  document.getElementById('dispSummary').textContent = summary;
-  document.getElementById('dispRaw').textContent = '\u201c' + raw + '\u201d';
-  todayCard.classList.add('has-entry');
-  document.getElementById('sbTodayText').textContent = summary;
-}
-
-// ════════ SUMMARIZE ════════
-async function summarize(text) {
-  const profile = await loadUserProfile(CURRENT_USER);
-  const name = profile.name || 'someone';
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: `You are helping someone named ${name} capture their life in beautiful, meaningful one-liners. They wrote about their day:\n\n"${text}"\n\nWrite a single poetic, warm, first-person sentence (10–20 words) that captures the essence of what they did. Make it feel personal, reflective, and memorable. No quotes, no preamble, just the sentence.` }]
-      })
-    });
-    const d = await res.json();
-    return d.content?.[0]?.text?.trim() || text;
-  } catch {
-    return text.length > 90 ? text.slice(0,87)+'…' : text;
-  }
-}
-
-// ════════ FEED ════════
-function renderFeed(data) {
-  const keys = Object.keys(data).sort((a,b)=>b.localeCompare(a)).filter(k=>k!==TODAY);
-  const feed = document.getElementById('feed');
-  feed.innerHTML = '';
-  if (!keys.length) { feed.innerHTML = '<p class="empty">your days will appear here ✦</p>'; return; }
-  keys.forEach((key, i) => {
-    const e = data[key];
-    const { month, day, full } = fmtShort(key);
-    const item = document.createElement('div');
-    item.className = 'feed-item';
-    item.dataset.key = key;
-    item.style.animationDelay = `${i*0.05}s`;
-    item.innerHTML = `
-      <div class="fi-date"><div class="fi-month">${month}</div><div class="fi-day">${day}</div></div>
-      <div class="fi-connector"><div class="fi-dot"></div><div class="fi-line"></div></div>
-      <div class="fi-body"><p class="fi-summary">${e.summary}</p><p class="fi-raw">\u201c${e.raw}\u201d</p></div>`;
-    item.addEventListener('click', () => openModal(full, e.summary, e.raw));
-    feed.appendChild(item);
-  });
-}
-
-// ════════ SIDEBAR SPINE ════════
-function renderSpine(data) {
-  const keys = Object.keys(data).sort((a,b)=>b.localeCompare(a)).filter(k=>k!==TODAY);
-  const list = document.getElementById('spineList');
-  list.innerHTML = '';
-  keys.forEach(key => {
-    const e = data[key];
-    const item = document.createElement('div');
-    item.className = 'spine-item';
-    item.dataset.key = key;
-    item.innerHTML = `<div class="spine-date">${fmtMini(key)}</div><div class="spine-text">${e.summary}</div>`;
-    item.addEventListener('click', () => {
-      const el = document.querySelector(`.feed-item[data-key="${key}"]`);
-      if (el) { el.scrollIntoView({ behavior:'smooth', block:'center' }); el.classList.add('open'); setTimeout(()=>el.classList.remove('open'), 2200); }
-    });
-    list.appendChild(item);
-  });
-}
-
-// ════════ SCROLL FILL ════════
-function initScrollFill() {
-  const fill = document.getElementById('spineFill');
-  window.addEventListener('scroll', () => {
-    const pct = document.body.scrollHeight > window.innerHeight
-      ? Math.min(100, window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) : 0;
-    fill.style.height = pct + '%';
-    document.querySelectorAll('.spine-item').forEach(si => {
-      const el = document.querySelector(`.feed-item[data-key="${si.dataset.key}"]`);
-      if (el) { const r = el.getBoundingClientRect(); si.classList.toggle('active', r.top < window.innerHeight * 0.55 && r.bottom > 0); }
-    });
-  }, { passive: true });
-}
-
-function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-
-// ════════ MODAL ════════
-function openModal(date, summary, raw) {
-  document.getElementById('mDate').textContent    = date;
-  document.getElementById('mSummary').textContent = summary;
-  document.getElementById('mRaw').textContent     = '\u201c' + raw + '\u201d';
-  document.getElementById('overlay').classList.add('open');
-}
-function bgClose(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
-function closeModal() { document.getElementById('overlay').classList.remove('open'); }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-// ════════ BOOT ════════
-// Firebase Auth persists login automatically — listen for auth state
-auth.onAuthStateChanged(async user => {
-  if (user) {
-    const profile = await loadUserProfile(user.uid);
-    if (profile.name) {
-      setSession(user.uid);
-      document.getElementById('landing').classList.add('out');
-      document.getElementById('app').style.display = 'flex';
-      document.getElementById('app').classList.add('visible');
-      initApp(user.uid, profile.name);
-    }
-  }
-});
 </script>
 </body>
 </html>
