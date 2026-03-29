@@ -641,66 +641,47 @@ body::after {
 </div>
 
 <script>
-// ════════════════════════════════════════════════════
-//  FIREBASE CONFIG — paste yours from Firebase console
-//  Leave as-is to use localStorage (works locally/for testing)
-// ════════════════════════════════════════════════════
 const FIREBASE_DB_URL = 'https://timeline-307ab-default-rtdb.firebaseio.com';
-// ════════════════════════════════════════════════════
 
-const USE_FIREBASE = !FIREBASE_DB_URL.includes('YOUR_PROJECT_ID');
-
-// Firebase Realtime Database via REST (no SDK needed)
 const db = {
   async get(path) {
-    const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`);
-    if (!res.ok) return null;
-    return res.json();
+    try {
+      const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`);
+      if (!res.ok) return null;
+      return res.json();
+    } catch { return null; }
   },
   async set(path, val) {
-    await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
+    const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(val)
     });
+    if (!res.ok) throw new Error(`Firebase write failed: ${res.status} ${await res.text()}`);
   }
 };
 
 async function loadUsers() {
   try {
-    if (USE_FIREBASE) {
-      const data = await db.get('users');
-      if (data) {
-        localStorage.setItem('tl_users_cache', JSON.stringify(data));
-        return data;
-      }
-    }
-    return JSON.parse(localStorage.getItem('tl_users') || localStorage.getItem('tl_users_cache') || '{}');
-  } catch {
-    return JSON.parse(localStorage.getItem('tl_users') || localStorage.getItem('tl_users_cache') || '{}');
-  }
+    const data = await db.get('users');
+    if (data) { localStorage.setItem('tl_users_cache', JSON.stringify(data)); return data; }
+  } catch {}
+  return JSON.parse(localStorage.getItem('tl_users_cache') || '{}');
 }
 async function saveUsers(u) {
-  try {
-    if (USE_FIREBASE) await db.set('users', u);
-    else localStorage.setItem('tl_users', JSON.stringify(u));
-    // always mirror to localStorage as fallback
-    localStorage.setItem('tl_users_cache', JSON.stringify(u));
-  } catch(e) {
-    // Firebase failed — save locally so user isn't locked out
-    localStorage.setItem('tl_users', JSON.stringify(u));
-    throw e; // re-throw so tryAuth knows
-  }
+  await db.set('users', u); // throws if Firebase fails — intentional
+  localStorage.setItem('tl_users_cache', JSON.stringify(u));
 }
 async function loadData(u) {
   try {
-    if (USE_FIREBASE) return (await db.get(`data/${u}`)) || {};
-    return JSON.parse(localStorage.getItem(`tl_data_${u}`) || '{}');
-  } catch { return {}; }
+    const data = await db.get(`data/${u}`);
+    if (data) return data;
+  } catch {}
+  return JSON.parse(localStorage.getItem(`tl_data_${u}`) || '{}');
 }
 async function saveData(u, d) {
-  if (USE_FIREBASE) await db.set(`data/${u}`, d);
-  else localStorage.setItem(`tl_data_${u}`, JSON.stringify(d));
+  await db.set(`data/${u}`, d);
+  localStorage.setItem(`tl_data_${u}`, JSON.stringify(d));
 }
 
 // Session — device-local only
@@ -741,7 +722,7 @@ pwInput.addEventListener('keydown',   e => { if (e.key === 'Enter') tryAuth(); }
 
 function showError(msg) {
   pcError.textContent = msg;
-  setTimeout(() => { pcError.textContent = '\u00a0'; }, 1800);
+  setTimeout(() => { pcError.textContent = '\u00a0'; }, 2200);
 }
 
 async function tryAuth() {
@@ -762,21 +743,18 @@ async function tryAuth() {
       if (!users[username]) { showError('no account found — create one?'); return; }
       if (!users[username].password) {
         users[username].password = pw;
-        try { await saveUsers(users); } catch {}
+        await saveUsers(users);
       } else if (users[username].password !== pw) {
         showError('wrong password ✦'); pwInput.value = ''; pwInput.focus(); return;
       }
     } else {
       if (users[username]) { showError('name taken — try signing in?'); return; }
       users[username] = { name: displayName, password: pw, created: Date.now() };
-      try { await saveUsers(users); } catch(e) {
-        // Firebase failed but we saved locally — still let them in
-        console.warn('Firebase save failed, using local fallback:', e);
-      }
+      await saveUsers(users); // will throw + show error if Firebase is down
     }
     doLogin(username);
   } catch(e) {
-    showError('something went wrong, try again ✦');
+    showError('couldn\'t reach the server — check Firebase rules ✦');
     console.error(e);
   } finally {
     btn.disabled = false;
@@ -836,7 +814,7 @@ async function initApp(username) {
   document.getElementById('sbLabel').textContent    = `${displayName}'s awesome life`;
   document.getElementById('todayLabel').textContent = fmtFull(TODAY);
 
-  const data = await loadData(CURRENT_USER);
+  const data = await loadData(username);
   if (data[TODAY]) showTodayEntry(data[TODAY].raw, data[TODAY].summary);
   renderFeed(data);
   renderSpine(data);
@@ -990,6 +968,353 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
     clearSession();
   }
 })();
+</script>
+</body>
+</html>
+
+const db = {
+  async get(path) {
+    try {
+      const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`);
+      if (!res.ok) return null;
+      return res.json();
+    } catch { return null; }
+  },
+  async set(path, val) {
+    try {
+      await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(val)
+      });
+    } catch {}
+  }
+};
+
+async function loadUsers() {
+  if (USE_FIREBASE) {
+    const d = await db.get('users');
+    if (d) { localStorage.setItem('tl_users_cache', JSON.stringify(d)); return d; }
+  }
+  return JSON.parse(localStorage.getItem('tl_users') || localStorage.getItem('tl_users_cache') || '{}');
+}
+async function saveUsers(u) {
+  localStorage.setItem('tl_users_cache', JSON.stringify(u));
+  if (USE_FIREBASE) await db.set('users', u);
+  else localStorage.setItem('tl_users', JSON.stringify(u));
+}
+async function loadData(u) {
+  if (USE_FIREBASE) {
+    const d = await db.get(`data/${u}`);
+    if (d) return d;
+  }
+  return JSON.parse(localStorage.getItem(`tl_data_${u}`) || '{}');
+}
+async function saveData(u, d) {
+  if (USE_FIREBASE) await db.set(`data/${u}`, d);
+  else localStorage.setItem(`tl_data_${u}`, JSON.stringify(d));
+}
+
+// ════════ SESSION ════════
+const SESS_KEY   = 'tl_sess_v1';
+const getSession  = () => localStorage.getItem(SESS_KEY);
+const setSession  = u => localStorage.setItem(SESS_KEY, u);
+const clearSession= () => localStorage.removeItem(SESS_KEY);
+
+// ════════ DATE HELPERS ════════
+const pad      = n => String(n).padStart(2,'0');
+const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+const parseKey = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d); };
+const fmtFull  = k => parseKey(k).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+const fmtShort = k => { const d = parseKey(k); return { month: d.toLocaleDateString('en-US',{month:'short'}), day: d.getDate(), full: fmtFull(k) }; };
+const fmtMini  = k => parseKey(k).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const TODAY    = todayKey();
+
+// ════════ MODE TOGGLE ════════
+let mode = 'signin';
+function setMode(m) {
+  mode = m;
+  document.getElementById('toggleSignIn').classList.toggle('active', m === 'signin');
+  document.getElementById('toggleCreate').classList.toggle('active', m === 'create');
+  document.getElementById('pcBtn').textContent = m === 'signin' ? 'enter →' : 'create account →';
+  document.getElementById('landingHint').textContent = m === 'signin' ? 'sign in with your name & password' : 'pick a name and a password';
+  document.getElementById('pcError').textContent = '\u00a0';
+  document.getElementById('nameInput').focus();
+}
+
+// ════════ LANDING AUTH ════════
+const nameInput = document.getElementById('nameInput');
+const pwInput   = document.getElementById('pwInput');
+const pcError   = document.getElementById('pcError');
+
+document.getElementById('pcBtn').addEventListener('click', tryAuth);
+nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') pwInput.focus(); });
+pwInput.addEventListener('keydown',   e => { if (e.key === 'Enter') tryAuth(); });
+
+function showError(msg) {
+  pcError.textContent = msg;
+  setTimeout(() => { pcError.textContent = '\u00a0'; }, 2200);
+}
+
+async function tryAuth() {
+  const raw = nameInput.value.trim();
+  const pw  = pwInput.value;
+  if (!raw) { showError('enter your name ✦'); nameInput.focus(); return; }
+  if (!pw)  { showError('enter a password ✦'); pwInput.focus(); return; }
+
+  const username    = raw.toLowerCase().replace(/\s+/g, '_');
+  const displayName = raw;
+  const email       = `${username}@timeline.app`; // fake email for Firebase Auth
+  const btn = document.getElementById('pcBtn');
+  btn.disabled = true; btn.textContent = '…';
+
+  try {
+    if (mode === 'create') {
+      // Check username isn't taken
+      const existingUid = await getUsernameUid(username);
+      if (existingUid) { showError('name taken — try signing in?'); return; }
+
+      // Create Firebase Auth account
+      const cred = await auth.createUserWithEmailAndPassword(email, pw);
+      const uid  = cred.user.uid;
+
+      // Save username → uid index + profile
+      await setUsernameUid(username, uid);
+      await saveUserProfile(uid, { name: displayName, username, created: Date.now() });
+
+      setSession(uid);
+      doLogin(uid, displayName);
+    } else {
+      // Look up uid from username
+      const uid = await getUsernameUid(username);
+      if (!uid) { showError('no account found — create one?'); return; }
+
+      await auth.signInWithEmailAndPassword(email, pw);
+      const profile = await loadUserProfile(uid);
+
+      setSession(uid);
+      doLogin(uid, profile.name || displayName);
+    }
+  } catch (e) {
+    if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+      showError('wrong password ✦'); pwInput.value = ''; pwInput.focus();
+    } else if (e.code === 'auth/weak-password') {
+      showError('password must be 6+ characters ✦');
+    } else if (e.code === 'auth/network-request-failed') {
+      showError('no internet connection ✦');
+    } else {
+      showError('something went wrong ✦');
+      console.error(e);
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = mode === 'signin' ? 'enter →' : 'create account →';
+  }
+}
+
+function doLogin(uid, displayName) {
+  nameInput.value = ''; pwInput.value = '';
+  document.getElementById('landing').classList.add('out');
+  setTimeout(() => {
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('app').classList.add('visible');
+    initApp(uid, displayName);
+  }, 680);
+}
+
+async function logout() {
+  await auth.signOut();
+  clearSession();
+  CURRENT_USER = null;
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('landing').classList.remove('out');
+  nameInput.value = ''; pwInput.value = '';
+}
+
+// ════════ STREAK ════════
+function calcStreak(data) {
+  const check = new Date();
+  if (!data[TODAY]) check.setDate(check.getDate() - 1);
+  let streak = 0;
+  while (true) {
+    const k = `${check.getFullYear()}-${pad(check.getMonth()+1)}-${pad(check.getDate())}`;
+    if (data[k]) { streak++; check.setDate(check.getDate() - 1); }
+    else break;
+  }
+  return streak;
+}
+function renderStreak(data) {
+  const n = calcStreak(data);
+  document.getElementById('streakNum').textContent = n;
+  document.getElementById('streakBadge').classList.toggle('hot', n >= 3);
+}
+
+// ════════ APP INIT ════════
+let CURRENT_USER = null; // stores uid
+
+async function initApp(uid, displayName) {
+  CURRENT_USER = uid;
+  document.getElementById('greetName').textContent  = displayName;
+  document.getElementById('sbAvatar').textContent   = displayName[0].toLowerCase();
+  document.getElementById('sbName').textContent     = displayName;
+  document.getElementById('sbLabel').textContent    = `${displayName}'s awesome life`;
+  document.getElementById('todayLabel').textContent = fmtFull(TODAY);
+
+  const data = await loadData(uid);
+  if (data[TODAY]) showTodayEntry(data[TODAY].raw, data[TODAY].summary);
+  renderFeed(data);
+  renderSpine(data);
+  renderStreak(data);
+  initScrollFill();
+}
+
+// ════════ ENTRY ════════
+const entryInput  = document.getElementById('entryInput');
+const archiveBtn  = document.getElementById('archiveBtn');
+const summarizing = document.getElementById('summarizing');
+const todayCard   = document.getElementById('todayCard');
+
+entryInput.addEventListener('input', () => {
+  archiveBtn.disabled = entryInput.value.trim().length < 3;
+});
+
+archiveBtn.addEventListener('click', async () => {
+  const raw = entryInput.value.trim();
+  if (!raw) return;
+  archiveBtn.disabled = true;
+  summarizing.classList.add('on');
+  const summary = await summarize(raw);
+  summarizing.classList.remove('on');
+  const data = await loadData(CURRENT_USER);
+  data[TODAY] = { raw, summary, ts: Date.now() };
+  await saveData(CURRENT_USER, data);
+  showTodayEntry(raw, summary);
+  renderFeed(data);
+  renderSpine(data);
+  renderStreak(data);
+});
+
+document.getElementById('editBtn').addEventListener('click', async () => {
+  const d = await loadData(CURRENT_USER);
+  if (d[TODAY]) {
+    entryInput.value = d[TODAY].raw;
+    archiveBtn.disabled = false;
+    todayCard.classList.remove('has-entry');
+    entryInput.focus();
+  }
+});
+
+function showTodayEntry(raw, summary) {
+  document.getElementById('dispSummary').textContent = summary;
+  document.getElementById('dispRaw').textContent = '\u201c' + raw + '\u201d';
+  todayCard.classList.add('has-entry');
+  document.getElementById('sbTodayText').textContent = summary;
+}
+
+// ════════ SUMMARIZE ════════
+async function summarize(text) {
+  const profile = await loadUserProfile(CURRENT_USER);
+  const name = profile.name || 'someone';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: `You are helping someone named ${name} capture their life in beautiful, meaningful one-liners. They wrote about their day:\n\n"${text}"\n\nWrite a single poetic, warm, first-person sentence (10–20 words) that captures the essence of what they did. Make it feel personal, reflective, and memorable. No quotes, no preamble, just the sentence.` }]
+      })
+    });
+    const d = await res.json();
+    return d.content?.[0]?.text?.trim() || text;
+  } catch {
+    return text.length > 90 ? text.slice(0,87)+'…' : text;
+  }
+}
+
+// ════════ FEED ════════
+function renderFeed(data) {
+  const keys = Object.keys(data).sort((a,b)=>b.localeCompare(a)).filter(k=>k!==TODAY);
+  const feed = document.getElementById('feed');
+  feed.innerHTML = '';
+  if (!keys.length) { feed.innerHTML = '<p class="empty">your days will appear here ✦</p>'; return; }
+  keys.forEach((key, i) => {
+    const e = data[key];
+    const { month, day, full } = fmtShort(key);
+    const item = document.createElement('div');
+    item.className = 'feed-item';
+    item.dataset.key = key;
+    item.style.animationDelay = `${i*0.05}s`;
+    item.innerHTML = `
+      <div class="fi-date"><div class="fi-month">${month}</div><div class="fi-day">${day}</div></div>
+      <div class="fi-connector"><div class="fi-dot"></div><div class="fi-line"></div></div>
+      <div class="fi-body"><p class="fi-summary">${e.summary}</p><p class="fi-raw">\u201c${e.raw}\u201d</p></div>`;
+    item.addEventListener('click', () => openModal(full, e.summary, e.raw));
+    feed.appendChild(item);
+  });
+}
+
+// ════════ SIDEBAR SPINE ════════
+function renderSpine(data) {
+  const keys = Object.keys(data).sort((a,b)=>b.localeCompare(a)).filter(k=>k!==TODAY);
+  const list = document.getElementById('spineList');
+  list.innerHTML = '';
+  keys.forEach(key => {
+    const e = data[key];
+    const item = document.createElement('div');
+    item.className = 'spine-item';
+    item.dataset.key = key;
+    item.innerHTML = `<div class="spine-date">${fmtMini(key)}</div><div class="spine-text">${e.summary}</div>`;
+    item.addEventListener('click', () => {
+      const el = document.querySelector(`.feed-item[data-key="${key}"]`);
+      if (el) { el.scrollIntoView({ behavior:'smooth', block:'center' }); el.classList.add('open'); setTimeout(()=>el.classList.remove('open'), 2200); }
+    });
+    list.appendChild(item);
+  });
+}
+
+// ════════ SCROLL FILL ════════
+function initScrollFill() {
+  const fill = document.getElementById('spineFill');
+  window.addEventListener('scroll', () => {
+    const pct = document.body.scrollHeight > window.innerHeight
+      ? Math.min(100, window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) : 0;
+    fill.style.height = pct + '%';
+    document.querySelectorAll('.spine-item').forEach(si => {
+      const el = document.querySelector(`.feed-item[data-key="${si.dataset.key}"]`);
+      if (el) { const r = el.getBoundingClientRect(); si.classList.toggle('active', r.top < window.innerHeight * 0.55 && r.bottom > 0); }
+    });
+  }, { passive: true });
+}
+
+function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+// ════════ MODAL ════════
+function openModal(date, summary, raw) {
+  document.getElementById('mDate').textContent    = date;
+  document.getElementById('mSummary').textContent = summary;
+  document.getElementById('mRaw').textContent     = '\u201c' + raw + '\u201d';
+  document.getElementById('overlay').classList.add('open');
+}
+function bgClose(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ════════ BOOT ════════
+// Firebase Auth persists login automatically — listen for auth state
+auth.onAuthStateChanged(async user => {
+  if (user) {
+    const profile = await loadUserProfile(user.uid);
+    if (profile.name) {
+      setSession(user.uid);
+      document.getElementById('landing').classList.add('out');
+      document.getElementById('app').style.display = 'flex';
+      document.getElementById('app').classList.add('visible');
+      initApp(user.uid, profile.name);
+    }
+  }
+});
 </script>
 </body>
 </html>
