@@ -366,6 +366,16 @@ body::after {
 }
 .entry-form textarea::placeholder { color: var(--bark); }
 
+/* hint shown below textarea */
+.newline-hint {
+  font-size: 0.65rem;
+  color: var(--bark);
+  opacity: 0.55;
+  margin-top: 0.35rem;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
 .form-footer {
   display: flex; justify-content: space-between; align-items: center;
   margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--sand);
@@ -397,9 +407,12 @@ body::after {
   background: var(--green);
   animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
 }
+
+/* newlines rendered via <br> — white-space: pre-wrap as fallback */
 .disp-summary {
   font-family: 'Instrument Serif', serif;
-  font-size: 1.3rem; line-height: 1.45; color: var(--ink); margin-bottom: 0.5rem;
+  font-size: 1.3rem; line-height: 1.55; color: var(--ink); margin-bottom: 0.5rem;
+  white-space: pre-wrap;
 }
 .disp-raw { font-size: 0.8rem; color: var(--bark); font-style: italic; line-height: 1.5; margin-bottom: 0.9rem; }
 .btn-edit {
@@ -439,7 +452,9 @@ body::after {
 .fi-body { flex: 1; }
 .fi-summary {
   font-family: 'Instrument Serif', serif;
-  font-size: 1.05rem; color: var(--ink); line-height: 1.4; transition: color 0.2s;
+  font-size: 1.05rem; color: var(--ink); line-height: 1.5; transition: color 0.2s;
+  white-space: pre-wrap;           /* honour newlines in feed */
+  word-break: break-word;
 }
 .feed-item:hover .fi-summary { color: var(--accent); }
 .fi-raw {
@@ -469,7 +484,12 @@ body::after {
 .overlay.open .modal { transform: none; }
 
 .modal-date { font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--bark); margin-bottom: 0.6rem; }
-.modal-summary { font-family: 'Instrument Serif', serif; font-size: 1.5rem; line-height: 1.3; color: var(--ink); margin-bottom: 1.1rem; }
+.modal-summary {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.5rem; line-height: 1.45; color: var(--ink); margin-bottom: 1.1rem;
+  white-space: pre-wrap;           /* honour newlines in modal */
+  word-break: break-word;
+}
 .modal-raw { font-size: 0.87rem; color: var(--soft-ink); line-height: 1.65; padding: 1rem 1.2rem; background: var(--warm); border-radius: 12px; font-style: italic; }
 .modal-foot { margin-top: 1.5rem; display: flex; justify-content: flex-end; }
 .btn-mclose {
@@ -549,6 +569,7 @@ body::after {
     <div class="today-card" id="todayCard">
       <div class="entry-form">
         <textarea id="entryInput" maxlength="500" placeholder="what was your highlight today?" rows="3"></textarea>
+        <p class="newline-hint">shift + enter for a new line</p>
         <div class="form-footer">
           <span style="font-size:0.8rem;color:var(--bark);font-style:italic;display:none" id="savingMsg">saving…</span>
           <button class="btn-archive" id="archiveBtn" disabled>archive it</button>
@@ -637,6 +658,20 @@ const fmtFull  = k => parseKey(k).toLocaleDateString('en-US',{weekday:'long',mon
 const fmtShort = k => { const d = parseKey(k); return { month: d.toLocaleDateString('en-US',{month:'short'}), day: d.getDate(), full: fmtFull(k) }; };
 const fmtMini  = k => parseKey(k).toLocaleDateString('en-US',{month:'short',day:'numeric'});
 const TODAY    = todayKey();
+
+// ── Safely escape raw text then convert \n → <br> for HTML rendering ──
+function nl2html(text) {
+  return text
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/\n/g,'<br>');
+}
+
+// Plain first line (strips newlines) for sidebar preview
+function firstLine(text) {
+  return text.split('\n')[0];
+}
 
 let mode = 'signin';
 function setMode(m) {
@@ -760,6 +795,9 @@ entryInput.addEventListener('input', () => {
   archiveBtn.disabled = entryInput.value.trim().length < 3;
 });
 
+// Allow Enter to insert a newline; Shift+Enter also works naturally.
+// Pressing plain Enter in a <textarea> already inserts \n, so no override needed.
+
 archiveBtn.addEventListener('click', async () => {
   const raw = entryInput.value.trim();
   if (!raw) return;
@@ -794,10 +832,13 @@ document.getElementById('editBtn').addEventListener('click', async () => {
 });
 
 function showTodayEntry(raw) {
-  document.getElementById('dispSummary').textContent = raw;
+  // Render newlines as <br> inside the summary
+  document.getElementById('dispSummary').innerHTML = nl2html(raw);
   document.getElementById('dispRaw').textContent = '';
   todayCard.classList.add('has-entry');
-  document.getElementById('sbTodayText').textContent = raw.length > 55 ? raw.slice(0,52)+'…' : raw;
+  // Sidebar preview: just show the first line, truncated
+  const preview = firstLine(raw);
+  document.getElementById('sbTodayText').textContent = preview.length > 55 ? preview.slice(0,52)+'…' : preview;
 }
 
 function renderFeed(data) {
@@ -812,10 +853,11 @@ function renderFeed(data) {
     item.className = 'feed-item';
     item.dataset.key = key;
     item.style.animationDelay = `${i*0.05}s`;
+    // Use innerHTML with nl2html so newlines display in the feed
     item.innerHTML = `
       <div class="fi-date"><div class="fi-month">${month}</div><div class="fi-day">${day}</div></div>
       <div class="fi-connector"><div class="fi-dot"></div><div class="fi-line"></div></div>
-      <div class="fi-body"><p class="fi-summary">${e.raw}</p></div>`;
+      <div class="fi-body"><p class="fi-summary">${nl2html(e.raw)}</p></div>`;
     item.addEventListener('click', () => openModal(full, e.raw));
     feed.appendChild(item);
   });
@@ -830,7 +872,9 @@ function renderSpine(data) {
     const item = document.createElement('div');
     item.className = 'spine-item';
     item.dataset.key = key;
-    item.innerHTML = `<div class="spine-date">${fmtMini(key)}</div><div class="spine-text">${e.raw}</div>`;
+    // Spine shows plain text (first line only, no <br>)
+    const preview = firstLine(e.raw);
+    item.innerHTML = `<div class="spine-date">${fmtMini(key)}</div><div class="spine-text">${preview.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`;
     item.addEventListener('click', () => {
       const el = document.querySelector(`.feed-item[data-key="${key}"]`);
       if (el) { el.scrollIntoView({ behavior:'smooth', block:'center' }); el.classList.add('open'); setTimeout(()=>el.classList.remove('open'), 2200); }
@@ -855,9 +899,10 @@ function initScrollFill() {
 function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
 function openModal(date, text) {
-  document.getElementById('mDate').textContent    = date;
-  document.getElementById('mSummary').textContent = text;
-  document.getElementById('mRaw').textContent     = '';
+  document.getElementById('mDate').textContent      = date;
+  // Render newlines as <br> in the modal too
+  document.getElementById('mSummary').innerHTML     = nl2html(text);
+  document.getElementById('mRaw').textContent       = '';
   document.getElementById('overlay').classList.add('open');
 }
 function bgClose(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
