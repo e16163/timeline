@@ -1,2 +1,2 @@
 # timeline
-another thing i just vibecoded
+thing every day
